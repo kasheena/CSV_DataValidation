@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from pandas_profiling import ProfileReport
+import pandasgui as pg
 
 def read_file(file_path):
     if file_path.name.endswith(('.csv', '.CSV')):
@@ -27,9 +27,8 @@ def main():
         if df1 is not None and df2 is not None:
             st.header("DataFrame 1 (Editable)")
             
-            # Use pandas-profiling to create an interactive profile report
-            profile = ProfileReport(df1, explorative=True)
-            st_profile_report(profile)
+            # Use pandasgui to create an interactive DataFrame viewer
+            gui = pg.show(df1, editable=True)
 
             st.header("DataFrame 2")
             st.table(df2)
