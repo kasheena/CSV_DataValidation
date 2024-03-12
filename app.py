@@ -29,10 +29,8 @@ def read_file(file_path, selected_sheets=None):
     return df
 
 def filter_records_by_selected_sheets(df, selected_sheets):
-    # Extract the sheet number from the index or any other relevant column
-    df['SheetNumber'] = df.index.str.extract(r'(\d+)')
     # Filter records from DataFrame based on selected sheets
-    filtered_df = df[df['SheetNumber'].astype(float).isin(selected_sheets)]
+    filtered_df = df[df['SheetName'].astype(str).str.extract(r'(\d+)', expand=False).astype(float).isin(selected_sheets)]
     return filtered_df
 
 def main():
