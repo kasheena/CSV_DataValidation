@@ -32,17 +32,18 @@ def main():
     st.title("Data Validation App")
 
     st.sidebar.header("Upload Files")
-    file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
-    file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+    uploaded_file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+    selected_sheets = None
 
-    if file1 and file2:
-        selected_sheets = None
+    if uploaded_file1 and uploaded_file1.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
+        st.sidebar.write("Choose sheets from CSV file:")
+        selected_sheets = st.sidebar.multiselect("Select sheets from the workbook:", [])
 
-        if file1.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
-            selected_sheets = st.sidebar.checkbox("Select sheets from Workbook (CSV 1)", value=True)
+    uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
-        df1 = read_file(file1, selected_sheets)
-        df2 = read_file(file2)
+    if uploaded_file1 and uploaded_file2:
+        df1 = read_file(uploaded_file1, selected_sheets)
+        df2 = read_file(uploaded_file2)
 
         if df1 is not None and df2 is not None:
             st.header("DataFrame 1 (Ignoring Null Values)")
