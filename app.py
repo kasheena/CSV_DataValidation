@@ -28,7 +28,7 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
-def filter_records(df):
+def filter_records(df, selected_sheets):
     # Filter records with specific values
     prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
     mask = df.astype(str).apply(lambda row: row.str.contains('|'.join(prefixes)), axis=1)
@@ -42,17 +42,18 @@ def main():
     uploaded_file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
     if uploaded_file1:
+        selected_sheets = st.sidebar.multiselect("Select sheets from the workbook:", [])
         uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
         if uploaded_file2:
-            df1 = read_file(uploaded_file1)
+            df1 = read_file(uploaded_file1, selected_sheets)
             df2 = read_file(uploaded_file2)
 
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
 
-                # Filter records from DataFrame based on the specified prefixes
-                df1_filtered = filter_records(df1)
+                # Filter records from DataFrame based on the specified prefixes and selected sheets
+                df1_filtered = filter_records(df1, selected_sheets)
 
                 st.table(df1_filtered)
 
@@ -60,15 +61,14 @@ def main():
                 st.table(df2)
 
                 # Data validation
-                # Perform cross-join (cartesian product) between the two DataFrames
-                validation_result = pd.merge(df1_filtered.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
-                validation_result = validation_result[validation_result['_merge'] == 'both'].drop(columns='_merge')
+                # Check if records from DataFrame 1 exist in DataFrame 2
+                validation_result = df1_filtered.isin(df2.values).all(axis=1)
 
                 st.header("Validation Result")
-                if validation_result.empty:
-                    st.write("No records from DataFrame 1 are present in DataFrame 2.")
+                if validation_result.all():
+                    st.write("All records from DataFrame 1 are present in DataFrame 2.")
                 else:
-                    st.table(validation_result.drop(columns='key'))
+                    st.write("Some records from DataFrame 1 are not present in DataFrame 2.")
 
 if __name__ == "__main__":
     main()
