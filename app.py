@@ -1,63 +1,51 @@
 import streamlit as st
 import pandas as pd
+import tabula
 
-def read_excel_sheets(file_path):
-    xls = pd.ExcelFile(file_path)
-    sheet_names = xls.sheet_names
-    selected_sheets = st.multiselect("Select sheets from the workbook:", sheet_names)
-    
-    if not selected_sheets:
-        st.warning("Please select at least one sheet.")
-        return None
-    
-    df_list = [pd.read_excel(xls, sheet_name=sheet) for sheet in selected_sheets]
-    df = pd.concat(df_list, ignore_index=True)
-    
+def read_pdf(file_path):
+    # Read PDF file into DataFrame
+    df = tabula.read_pdf(file_path, pages='all', multiple_tables=True)
     return df
 
-def read_file(file_path, selected_sheets=None):
-    if file_path.name.endswith(('.csv', '.CSV')):
+def read_file(file_path):
+    if file_path.name.endswith('.pdf'):
+        df = read_pdf(file_path)
+    elif file_path.name.endswith(('.csv', '.CSV')):
         df = pd.read_csv(file_path)
     elif file_path.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
-        if selected_sheets is not None:
-            df = read_excel_sheets(file_path)
-        else:
-            df = pd.read_excel(file_path)
+        df = pd.read_excel(file_path)
     else:
-        st.error("Unsupported file format. Please upload a CSV or Excel file.")
+        st.error("Unsupported file format. Please upload a PDF, CSV, or Excel file.")
         return None
     return df
-
-def map_values(df):
-    # Generate a mapping based on unique values in DataFrame 1
-    unique_values = df.stack().unique()
-    mapping = {value: f'Label {i+1}' for i, value in enumerate(unique_values)}
-
-    # Map values to labels
-    df_mapped = df.applymap(lambda x: mapping.get(x, x))
-    return df_mapped
 
 def main():
     st.title("Data Validation App")
 
     st.sidebar.header("Upload Files")
-    uploaded_file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+    uploaded_file1 = st.sidebar.file_uploader("Upload PDF, CSV, or Excel", type=["pdf", "csv", "xls", "xlsx", "xlsm", "xlsb"])
 
     if uploaded_file1:
-        selected_sheets = st.sidebar.multiselect("Select sheets from the workbook:", [])
-        uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+        uploaded_file2 = st.sidebar.file_uploader("Upload CSV, or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
         if uploaded_file2:
-            df1 = read_file(uploaded_file1, selected_sheets)
+            df1 = read_file(uploaded_file1)
             df2 = read_file(uploaded_file2)
 
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
 
-                # Map values to labels
-                df1_mapped = map_values(df1)
+                # Check if df1 is a list of DataFrames (result from PDF parsing)
+                if isinstance(df1, list):
+                    # Concatenate all DataFrames into one
+                    df1_concatenated = pd.concat(df1, ignore_index=True)
+                    # Filter columns that are not null
+                    df1_filtered = df1_concatenated.dropna(axis=1, how='all')
+                else:
+                    # For CSV or Excel files, filter columns that are not null
+                    df1_filtered = df1.dropna(axis=1, how='all')
 
-                st.table(df1_mapped)
+                st.table(df1_filtered)
 
                 st.header("DataFrame 2")
                 st.table(df2)
@@ -65,7 +53,7 @@ def main():
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
-                for index, row in df1_mapped.iterrows():
+                for index, row in df1_filtered.iterrows():
                     if row.values.tolist() in df2.values.tolist():
                         validation_result.append(True)
                     else:
