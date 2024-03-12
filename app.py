@@ -29,8 +29,10 @@ def read_file(file_path, selected_sheets=None):
     return df
 
 def filter_records_by_selected_sheets(df, selected_sheets):
-    # Filter records from DataFrame 1 based on selected sheets
-    filtered_df = df[df['SheetName'].str.extract(r'(\d+)').astype(float).isin(selected_sheets)]
+    # Extract the sheet number from the index or any other relevant column
+    df['SheetNumber'] = df.index.str.extract(r'(\d+)')
+    # Filter records from DataFrame based on selected sheets
+    filtered_df = df[df['SheetNumber'].astype(float).isin(selected_sheets)]
     return filtered_df
 
 def main():
@@ -51,7 +53,7 @@ def main():
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
 
-                # Filter records from DataFrame 1 based on selected sheets
+                # Filter records from DataFrame based on selected sheets
                 df1_filtered = filter_records_by_selected_sheets(df1, selected_sheets)
 
                 st.table(df1_filtered)
