@@ -1,11 +1,16 @@
 import streamlit as st
 import pandas as pd
-import camelot
+import pdfplumber
 
 def read_pdf(file_path):
-    tables = camelot.read_pdf(file_path, flavor='stream', pages='all')
-    df_list = [table.df for table in tables]
-    df = pd.concat(df_list, ignore_index=True)
+    with pdfplumber.open(file_path) as pdf:
+        pages = pdf.pages
+        df_list = []
+        for page in pages:
+            table = page.extract_tables()
+            for tab in table:
+                df_list.append(pd.DataFrame(tab))
+        df = pd.concat(df_list, ignore_index=True)
     return df
 
 def read_file(file_path):
