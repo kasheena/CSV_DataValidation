@@ -22,7 +22,7 @@ def read_file(file_path, selected_sheets=None):
         if selected_sheets is not None:
             df = read_excel_sheets(file_path)
         else:
-            df = pd.read_excel(pd.ExcelFile(file_path), engine='xlrd')
+            df = pd.read_excel(file_path)
     else:
         st.error("Unsupported file format. Please upload a CSV or Excel file.")
         return None
