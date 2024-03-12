@@ -29,9 +29,10 @@ def read_file(file_path, selected_sheets=None):
     return df
 
 def filter_records(df):
-    # Filter records starting with the specified prefixes
+    # Filter records with specific values
     prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
-    filtered_df = df[df['ColumnName'].str.startswith(tuple(prefixes))]
+    filtered_rows = [row for _, row in df.iterrows() if any(row.str.startswith(prefix) for prefix in prefixes)]
+    filtered_df = pd.DataFrame(filtered_rows)
     return filtered_df
 
 def main():
