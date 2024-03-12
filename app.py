@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pandasgui as pg
 
 def read_file(file_path):
     if file_path.name.endswith(('.csv', '.CSV')):
@@ -25,16 +24,18 @@ def main():
         df2 = read_file(file2)
 
         if df1 is not None and df2 is not None:
-            st.header("DataFrame 1 (Editable)")
+            st.header("DataFrame 1 (Ignoring Null Values)")
             
-            # Use pandasgui to create an interactive DataFrame viewer
-            gui = pg.show(df1, editable=True)
+            # Create a DataFrame excluding rows with null values
+            df1_cleaned = df1.dropna()
+
+            st.table(df1_cleaned)
 
             st.header("DataFrame 2")
             st.table(df2)
 
             # Data validation
-            validation_result = pd.merge(df1, df2, how='left', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1)
+            validation_result = pd.merge(df1_cleaned, df2, how='left', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1)
             
             st.header("Validation Result")
             st.table(validation_result)
