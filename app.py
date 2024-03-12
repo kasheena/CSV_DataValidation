@@ -28,6 +28,12 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
+def filter_records_by_sheet_no(df):
+    # Filter records by sheet number present in the sheet names
+    sheet_numbers = df['SheetName'].str.extract(r'(\d+)')
+    filtered_df = df[sheet_numbers.astype(float).notna()]
+    return filtered_df
+
 def main():
     st.title("Data Validation App")
 
@@ -48,14 +54,17 @@ def main():
         if df1 is not None and df2 is not None:
             st.header("DataFrame 1")
 
-            st.table(df1)
+            # Filter records from DataFrame 1 based on sheet number
+            df1_filtered = filter_records_by_sheet_no(df1)
+
+            st.table(df1_filtered)
 
             st.header("DataFrame 2")
             st.table(df2)
 
             # Data validation
             # Perform cross-join (cartesian product) between the two DataFrames
-            validation_result = pd.merge(df1.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
+            validation_result = pd.merge(df1_filtered.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
             validation_result = validation_result[validation_result['_merge'] == 'both'].drop(columns='_merge')
 
             st.header("Validation Result")
