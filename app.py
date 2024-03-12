@@ -31,8 +31,8 @@ def read_file(file_path, selected_sheets=None):
 def filter_records(df):
     # Filter records with specific values
     prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
-    filtered_rows = [row for _, row in df.iterrows() if any(row.str.startswith(prefix) for prefix in prefixes)]
-    filtered_df = pd.DataFrame(filtered_rows)
+    mask = df.apply(lambda row: any(row.str.startswith(prefix) for prefix in prefixes), axis=1)
+    filtered_df = df[mask]
     return filtered_df
 
 def main():
