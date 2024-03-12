@@ -28,12 +28,14 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
-def filter_columns(df):
-    # Filter columns that are at least 80% full
-    num_rows = len(df)
-    filled_threshold = num_rows * 0.8
-    filtered_df = df.dropna(thresh=filled_threshold, axis=1)
-    return filtered_df
+def map_values(df):
+    # Generate a mapping based on unique values in DataFrame 1
+    unique_values = df.stack().unique()
+    mapping = {value: f'Label {i+1}' for i, value in enumerate(unique_values)}
+
+    # Map values to labels
+    df_mapped = df.applymap(lambda x: mapping.get(x, x))
+    return df_mapped
 
 def main():
     st.title("Data Validation App")
@@ -52,10 +54,10 @@ def main():
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
 
-                # Filter columns that are at least 80% full
-                df1_filtered = filter_columns(df1)
+                # Map values to labels
+                df1_mapped = map_values(df1)
 
-                st.table(df1_filtered)
+                st.table(df1_mapped)
 
                 st.header("DataFrame 2")
                 st.table(df2)
@@ -63,7 +65,7 @@ def main():
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
-                for index, row in df1_filtered.iterrows():
+                for index, row in df1_mapped.iterrows():
                     if row.values.tolist() in df2.values.tolist():
                         validation_result.append(True)
                     else:
