@@ -62,10 +62,15 @@ def main():
 
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
-                validation_result = df1_filtered.isin(df2.values).all(axis=1)
+                validation_result = []
+                for _, row in df1_filtered.iterrows():
+                    if any(row.astype(str).str.contains(prefix) for prefix in prefixes):
+                        validation_result.append(True)
+                    else:
+                        validation_result.append(False)
 
                 st.header("Validation Result")
-                if validation_result.all():
+                if all(validation_result):
                     st.write("All records from DataFrame 1 are present in DataFrame 2.")
                 else:
                     st.write("Some records from DataFrame 1 are not present in DataFrame 2.")
