@@ -28,6 +28,13 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
+def filter_columns(df):
+    # Filter columns that are at least 80% full
+    num_rows = len(df)
+    filled_threshold = num_rows * 0.8
+    filtered_df = df.dropna(thresh=filled_threshold, axis=1)
+    return filtered_df
+
 def main():
     st.title("Data Validation App")
 
@@ -44,9 +51,9 @@ def main():
 
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
-                
-                # Drop columns with all NaN values
-                df1_filtered = df1.dropna(axis=1, how='all')
+
+                # Filter columns that are at least 80% full
+                df1_filtered = filter_columns(df1)
 
                 st.table(df1_filtered)
 
@@ -57,7 +64,7 @@ def main():
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
                 for _, row in df1_filtered.iterrows():
-                    if any(row.astype(str).isin(df2.values)):
+                    if row.isin(df2.values).any():
                         validation_result.append(True)
                     else:
                         validation_result.append(False)
