@@ -63,8 +63,8 @@ def main():
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
-                for _, row in df1_filtered.iterrows():
-                    if row.isin(df2.values).any():
+                for index, row in df1_filtered.iterrows():
+                    if row.values.tolist() in df2.values.tolist():
                         validation_result.append(True)
                     else:
                         validation_result.append(False)
