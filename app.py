@@ -1,3 +1,33 @@
+import streamlit as st
+import pandas as pd
+
+def read_excel_sheets(file_path):
+    xls = pd.ExcelFile(file_path)
+    sheet_names = xls.sheet_names
+    selected_sheets = st.multiselect("Select sheets from the workbook:", sheet_names)
+    
+    if not selected_sheets:
+        st.warning("Please select at least one sheet.")
+        return None
+    
+    df_list = [pd.read_excel(xls, sheet_name=sheet) for sheet in selected_sheets]
+    df = pd.concat(df_list, ignore_index=True)
+    
+    return df
+
+def read_file(file_path, selected_sheets=None):
+    if file_path.name.endswith(('.csv', '.CSV')):
+        df = pd.read_csv(file_path)
+    elif file_path.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
+        if selected_sheets is not None:
+            df = read_excel_sheets(file_path)
+        else:
+            df = pd.read_excel(pd.ExcelFile(file_path), engine='xlrd')
+    else:
+        st.error("Unsupported file format. Please upload a CSV or Excel file.")
+        return None
+    return df
+
 def main():
     st.title("Data Validation App")
 
@@ -18,7 +48,6 @@ def main():
         if df1 is not None and df2 is not None:
             st.header("DataFrame 1")
 
-            # Display DataFrame 1
             st.table(df1)
 
             st.header("DataFrame 2")
