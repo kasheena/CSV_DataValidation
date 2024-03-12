@@ -43,23 +43,21 @@ def main():
             df2 = read_file(uploaded_file2)
 
             if df1 is not None and df2 is not None:
-                st.header("DataFrame 1 Before Filtering")
-                st.write(df1)
-
-                # Remove columns that are entirely null from DataFrame 1
+                st.header("DataFrame 1")
+                
+                # Drop columns with all NaN values
                 df1_filtered = df1.dropna(axis=1, how='all')
 
-                st.header("DataFrame 1 After Filtering")
-                st.write(df1_filtered)
+                st.table(df1_filtered)
 
                 st.header("DataFrame 2")
-                st.write(df2)
+                st.table(df2)
 
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
                 for _, row in df1_filtered.iterrows():
-                    if any(row.astype(str).isin(df2.values.flatten())):
+                    if any(row.astype(str).isin(df2.values)):
                         validation_result.append(True)
                     else:
                         validation_result.append(False)
