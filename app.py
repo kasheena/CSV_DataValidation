@@ -54,10 +54,15 @@ def main():
             st.table(df2)
 
             # Data validation
-            validation_result = pd.merge(df1, df2, how='left', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1)
+            # Perform cross-join (cartesian product) between the two DataFrames
+            validation_result = pd.merge(df1.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
+            validation_result = validation_result[validation_result['_merge'] == 'both'].drop(columns='_merge')
 
             st.header("Validation Result")
-            st.table(validation_result)
+            if validation_result.empty:
+                st.write("No records from DataFrame 1 are present in DataFrame 2.")
+            else:
+                st.table(validation_result.drop(columns='key'))
 
 if __name__ == "__main__":
     main()
