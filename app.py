@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+# Define prefixes globally
+prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
+
 def read_excel_sheets(file_path):
     xls = pd.ExcelFile(file_path)
     sheet_names = xls.sheet_names
@@ -30,7 +33,6 @@ def read_file(file_path, selected_sheets=None):
 
 def filter_records(df, selected_sheets):
     # Filter records with specific values
-    prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
     mask = df.astype(str).apply(lambda row: row.str.contains('|'.join(prefixes)), axis=1)
     filtered_df = df[mask.any(axis=1)]
     return filtered_df
