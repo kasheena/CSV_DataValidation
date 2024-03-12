@@ -28,10 +28,9 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
-def filter_records_by_sheet_no(df):
-    # Filter records by sheet number present in the sheet names
-    sheet_numbers = df['SheetName'].str.extract(r'(\d+)')
-    filtered_df = df[sheet_numbers.astype(float).notna()]
+def filter_records_by_selected_sheets(df, selected_sheets):
+    # Filter records from DataFrame 1 based on selected sheets
+    filtered_df = df[df['SheetName'].str.extract(r'(\d+)').astype(float).isin(selected_sheets)]
     return filtered_df
 
 def main():
@@ -39,39 +38,37 @@ def main():
 
     st.sidebar.header("Upload Files")
     uploaded_file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
-    selected_sheets = None
 
     if uploaded_file1 and uploaded_file1.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
-        st.sidebar.write("Choose sheets from CSV file:")
         selected_sheets = st.sidebar.multiselect("Select sheets from the workbook:", [])
 
-    uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+        uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
-    if uploaded_file1 and uploaded_file2:
-        df1 = read_file(uploaded_file1, selected_sheets)
-        df2 = read_file(uploaded_file2)
+        if uploaded_file2:
+            df1 = read_file(uploaded_file1)
+            df2 = read_file(uploaded_file2)
 
-        if df1 is not None and df2 is not None:
-            st.header("DataFrame 1")
+            if df1 is not None and df2 is not None:
+                st.header("DataFrame 1")
 
-            # Filter records from DataFrame 1 based on sheet number
-            df1_filtered = filter_records_by_sheet_no(df1)
+                # Filter records from DataFrame 1 based on selected sheets
+                df1_filtered = filter_records_by_selected_sheets(df1, selected_sheets)
 
-            st.table(df1_filtered)
+                st.table(df1_filtered)
 
-            st.header("DataFrame 2")
-            st.table(df2)
+                st.header("DataFrame 2")
+                st.table(df2)
 
-            # Data validation
-            # Perform cross-join (cartesian product) between the two DataFrames
-            validation_result = pd.merge(df1_filtered.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
-            validation_result = validation_result[validation_result['_merge'] == 'both'].drop(columns='_merge')
+                # Data validation
+                # Perform cross-join (cartesian product) between the two DataFrames
+                validation_result = pd.merge(df1_filtered.assign(key=1), df2.assign(key=1), on='key', suffixes=('_df1', '_df2'), indicator=True)
+                validation_result = validation_result[validation_result['_merge'] == 'both'].drop(columns='_merge')
 
-            st.header("Validation Result")
-            if validation_result.empty:
-                st.write("No records from DataFrame 1 are present in DataFrame 2.")
-            else:
-                st.table(validation_result.drop(columns='key'))
+                st.header("Validation Result")
+                if validation_result.empty:
+                    st.write("No records from DataFrame 1 are present in DataFrame 2.")
+                else:
+                    st.table(validation_result.drop(columns='key'))
 
 if __name__ == "__main__":
     main()
