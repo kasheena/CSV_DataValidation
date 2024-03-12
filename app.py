@@ -4,12 +4,14 @@ import pdfplumber
 
 def read_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
-        pages = pdf.pages
         df_list = []
-        for page in pages:
-            table = page.extract_tables()
-            for tab in table:
-                df_list.append(pd.DataFrame(tab))
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            for table in tables:
+                df_list.append(pd.DataFrame(table))
+        if not df_list:
+            st.error("No tables found in the PDF file.")
+            return None
         df = pd.concat(df_list, ignore_index=True)
     return df
 
@@ -29,10 +31,10 @@ def main():
     st.title("Data Validation App")
 
     st.sidebar.header("Upload Files")
-    uploaded_file1 = st.sidebar.file_uploader("Upload PDF, CSV, or Excel", type=["pdf", "csv", "xls", "xlsx", "xlsm", "xlsb"])
+    uploaded_file1 = st.sidebar.file_uploader("Upload PDF, CSV, or Excel for DataFrame 1", type=["pdf", "csv", "xls", "xlsx", "xlsm", "xlsb"])
 
     if uploaded_file1:
-        uploaded_file2 = st.sidebar.file_uploader("Upload CSV, or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
+        uploaded_file2 = st.sidebar.file_uploader("Upload CSV, or Excel for DataFrame 2", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
         if uploaded_file2:
             df1 = read_file(uploaded_file1)
