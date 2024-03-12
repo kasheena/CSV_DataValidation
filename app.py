@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
-import tabula
+import camelot
 
 def read_pdf(file_path):
-    # Read PDF file into DataFrame
-    df = tabula.read_pdf(file_path, pages='all', multiple_tables=True)
+    tables = camelot.read_pdf(file_path, flavor='stream', pages='all')
+    df_list = [table.df for table in tables]
+    df = pd.concat(df_list, ignore_index=True)
     return df
 
 def read_file(file_path):
@@ -34,18 +35,7 @@ def main():
 
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
-
-                # Check if df1 is a list of DataFrames (result from PDF parsing)
-                if isinstance(df1, list):
-                    # Concatenate all DataFrames into one
-                    df1_concatenated = pd.concat(df1, ignore_index=True)
-                    # Filter columns that are not null
-                    df1_filtered = df1_concatenated.dropna(axis=1, how='all')
-                else:
-                    # For CSV or Excel files, filter columns that are not null
-                    df1_filtered = df1.dropna(axis=1, how='all')
-
-                st.table(df1_filtered)
+                st.table(df1)
 
                 st.header("DataFrame 2")
                 st.table(df2)
@@ -53,7 +43,7 @@ def main():
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
-                for index, row in df1_filtered.iterrows():
+                for index, row in df1.iterrows():
                     if row.values.tolist() in df2.values.tolist():
                         validation_result.append(True)
                     else:
