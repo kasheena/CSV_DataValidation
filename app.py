@@ -25,17 +25,13 @@ def main():
 
         if df1 is not None and df2 is not None:
             st.header("DataFrame 1 (Editable)")
-            editable_df1 = st.table(df1)
+            st.dataframe(df1, edit_mode=True)
 
-            # Allow user to edit DataFrame 1
-            st.write("Edit DataFrame 1 as needed:")
-            new_df1 = editable_df1.editable()
-            
             st.header("DataFrame 2")
             st.table(df2)
 
             # Data validation
-            validation_result = pd.merge(new_df1, df2, how='left', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1)
+            validation_result = pd.merge(df1, df2, how='left', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1)
             
             st.header("Validation Result")
             st.table(validation_result)
