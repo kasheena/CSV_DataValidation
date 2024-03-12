@@ -28,9 +28,10 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
-def filter_records_by_selected_sheets(df, selected_sheets):
-    # Filter records from DataFrame based on selected sheets
-    filtered_df = df[df['SheetName'].astype(str).str.extract(r'(\d+)', expand=False).astype(float).isin(selected_sheets)]
+def filter_records(df):
+    # Filter records starting with the specified prefixes
+    prefixes = ['5C', '5E', '5G', '6C', '6E', '6G', '7E', '7C', '7G', '7D', '8E', '8C', '8G', '9E', '9C']
+    filtered_df = df[df['ColumnName'].str.startswith(tuple(prefixes))]
     return filtered_df
 
 def main():
@@ -39,9 +40,7 @@ def main():
     st.sidebar.header("Upload Files")
     uploaded_file1 = st.sidebar.file_uploader("Upload Workbook (CSV 1 or Excel)", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
-    if uploaded_file1 and uploaded_file1.name.endswith(('.xls', '.xlsx', '.xlsm', '.xlsb')):
-        selected_sheets = st.sidebar.multiselect("Select sheets from the workbook:", [])
-
+    if uploaded_file1:
         uploaded_file2 = st.sidebar.file_uploader("Upload CSV 2 or Excel", type=["csv", "xls", "xlsx", "xlsm", "xlsb"])
 
         if uploaded_file2:
@@ -51,8 +50,8 @@ def main():
             if df1 is not None and df2 is not None:
                 st.header("DataFrame 1")
 
-                # Filter records from DataFrame based on selected sheets
-                df1_filtered = filter_records_by_selected_sheets(df1, selected_sheets)
+                # Filter records from DataFrame based on the specified prefixes
+                df1_filtered = filter_records(df1)
 
                 st.table(df1_filtered)
 
