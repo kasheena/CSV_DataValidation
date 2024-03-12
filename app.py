@@ -28,11 +28,6 @@ def read_file(file_path, selected_sheets=None):
         return None
     return df
 
-def filter_records(df, selected_sheets):
-    # Filter records with non-null values in any column
-    filtered_df = df.dropna(axis=0, how='all')
-    return filtered_df
-
 def main():
     st.title("Data Validation App")
 
@@ -48,21 +43,23 @@ def main():
             df2 = read_file(uploaded_file2)
 
             if df1 is not None and df2 is not None:
-                st.header("DataFrame 1")
+                st.header("DataFrame 1 Before Filtering")
+                st.write(df1)
 
-                # Filter records from DataFrame based on the specified prefixes and selected sheets
-                df1_filtered = filter_records(df1, selected_sheets)
+                # Remove columns that are entirely null from DataFrame 1
+                df1_filtered = df1.dropna(axis=1, how='all')
 
-                st.table(df1_filtered)
+                st.header("DataFrame 1 After Filtering")
+                st.write(df1_filtered)
 
                 st.header("DataFrame 2")
-                st.table(df2)
+                st.write(df2)
 
                 # Data validation
                 # Check if records from DataFrame 1 exist in DataFrame 2
                 validation_result = []
                 for _, row in df1_filtered.iterrows():
-                    if any(row.astype(str).str.contains(prefix) for prefix in prefixes):
+                    if any(row.astype(str).isin(df2.values.flatten())):
                         validation_result.append(True)
                     else:
                         validation_result.append(False)
