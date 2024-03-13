@@ -93,6 +93,14 @@ def main():
                 st.header("Mismatched Values")
                 st.write(mismatched_values)
 
-
+        # Additional functionality
+        if 'Line Label' in df2.columns and 'PCL code' in df2.columns:
+            sales_mapping = {}
+            for index, row in df2.iterrows():
+                if 'sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']):
+                    sales_mapping[row['Line Label']] = row['PCL code']
+            
+            st.header("Sales Mapping")
+            st.write(sales_mapping)
 if __name__ == "__main__":
     main()
