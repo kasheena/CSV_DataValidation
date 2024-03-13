@@ -56,12 +56,9 @@ def main():
                 
                 # Create DataFrame 4 with only text values from DataFrame 3
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
-                text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) else None)
+                text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
                 text_values_list = text_values_df4.stack().tolist()
-                
-                # Exclude 'nan' text values from the list
-                text_values_list = [value for value in text_values_list if pd.notna(value)]
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_list)
