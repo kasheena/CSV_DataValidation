@@ -77,12 +77,18 @@ def main():
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_dict = text_values_df4.to_dict(orient='list')
+                # Manually set the keys and exclude null values
+                text_values_dict = {
+                    "Sales": [value for value in text_values_df4["Sales"] if value and not pd.isna(value)],
+                    "Gross Profit": [value for value in text_values_df4["Gross Profit"] if value and not pd.isna(value)],
+                    "Incentives": [value for value in text_values_df4["Incentives"] if value and not pd.isna(value)],
+                    "Chargeback": [value for value in text_values_df4["Chargeback"] if value and not pd.isna(value)]
+                }
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_dict)
-            else:
-                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+                else:
+                    st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
 
 if __name__ == "__main__":
     main()
