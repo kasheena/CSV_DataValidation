@@ -68,9 +68,6 @@ def main():
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
             if not unmatched_records.empty:
-                st.header("Records not present in DataFrame 2")
-                st.table(unmatched_records)
-                
                 # Create DataFrame 4 with only text values from DataFrame 3
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
