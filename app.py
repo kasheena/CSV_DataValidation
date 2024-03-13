@@ -37,20 +37,27 @@ def main():
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
 
-            # Create dictionary 'input'
+            # Initialize the input_dict
             input_dict = {}
-            headers = text_values_list_1_1[:3]  # Get first three records as headers
-            line_label_values = [value for value in text_values_list_1_1[3:] if 'New' in value]  # Store values for 'Line Label' key
-            input_dict["Line Label"] = line_label_values  # Add values to 'Line Label' key
+            
+            # Define the headers
+            headers = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
+            
+            # Iterate through the headers
             for header in headers:
-                if header == headers[0]:  # If it's the first header
-                    input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
-                elif header == headers[1]:  # If it's the second header
-                    input_dict["Gross Profit"] = [value for value in text_values_list_1_1[3:] if 'E' in value and re.match(r'^\d', value)]
-                elif header == headers[2]:  # If it's the third header
-                    input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
-                elif header == headers[3]:  # If it's the fourth header
-                    input_dict["Chargeback"] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
+                if header == "Sales":
+                    # Include values with 'C' and starting with a number
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
+                elif header == "Gross Profit":
+                    # Include values with 'E' and starting with a number
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'E' in value and re.match(r'^\d', value)]
+                elif header == "Incentives":
+                    # Include values with 'G' and starting with a number
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
+                elif header == "Chargeback":
+                    # Include values with 'D' and starting with a number
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
+
 
             st.header("Input Dictionary")
             st.write(input_dict)
