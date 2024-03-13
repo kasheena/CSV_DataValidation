@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 
-def read_file(file_path, sheet_name):
+def read_file(file_path, sheet_name, skip_rows):
     if file_path.name.endswith('.xlsx'):
         if sheet_name:
-            df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=skip_rows)
         else:
             # If no sheet selected, read the first sheet by default
-            df = pd.read_excel(file_path, sheet_name=0)
+            df = pd.read_excel(file_path, sheet_name=0, skiprows=skip_rows)
     else:
         st.error("Unsupported file format. Please upload an Excel file for DataFrame 1.")
         return None
@@ -30,21 +30,22 @@ def main():
 
     if uploaded_file1 and uploaded_file2:
         selected_sheet = st.sidebar.selectbox("Select sheet", [""] + pd.ExcelFile(uploaded_file1).sheet_names)
-        df1 = read_file(uploaded_file1, selected_sheet)
+        skip_rows = st.sidebar.slider("Skip Rows", min_value=0, max_value=20, value=9)
+        df1 = read_file(uploaded_file1, selected_sheet, skip_rows)
         df2 = read_csv(uploaded_file2)
 
         if df1 is not None and df2 is not None:
-            # Select only 'PCL code' column from DataFrame 2
-            df2 = df2[['PCL code']]
+            # Select only column 6 from DataFrame 2
+            df2 = df2.iloc[:, [5]]
 
             # Compare DataFrames to find records in DataFrame 1 that don't exist in DataFrame 2
-            df3 = pd.merge(df1, df2, how='left', left_on='PCL code', right_on='PCL code', indicator=True)
+            df3 = pd.merge(df1, df2, how='left', left_index=True, right_index=True, indicator=True)
             df3 = df3[df3['_merge'] == 'left_only'].drop('_merge', axis=1)
 
             st.header("DataFrame 1")
             st.table(df1)
 
-            st.header("DataFrame 2 (PCL code)")
+            st.header("DataFrame 2 (Column 6)")
             st.table(df2)
 
             st.header("Records not present in DataFrame 2")
