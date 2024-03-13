@@ -16,7 +16,7 @@ def read_file(file_path, sheet_name):
 def filter_columns(df):
     keywords = ['sales', 'gross profit', 'incentives']
     # Filter columns containing specified keywords
-    filtered_columns = [col for col in df.columns if any(keyword in col.lower() for keyword in keywords)]
+    filtered_columns = [col for col in df.columns if any(keyword.lower() in str(col).lower() for keyword in keywords)]
     return df[filtered_columns]
 
 def main():
