@@ -41,11 +41,13 @@ def main():
             headers = text_values_list_1_1[:3]  # Get first three records as headers
             for header in headers:
                 if header == headers[0]:  # If it's the first header
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'C' in value]
+                    input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and header in value]
                 elif header == headers[1]:  # If it's the second header
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'E' in value]
+                    input_dict["Gross Profit"] = [value for value in text_values_list_1_1[3:] if 'E' in value and header in value]
                 elif header == headers[2]:  # If it's the third header
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'G' in value]
+                    input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and header in value]
+                else:
+                    input_dict["Line Label"] = [value for value in text_values_list_1_1[3:] if header in value]
 
             st.header("Input Dictionary")
             st.write(input_dict)
