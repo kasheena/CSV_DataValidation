@@ -4,10 +4,10 @@ import pandas as pd
 def read_file(file_path, sheet_name):
     if file_path.name.endswith(('.xlsx', '.xls')):
         if sheet_name:
-            df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=9)
         else:
             # If no sheet selected, read the first sheet by default
-            df = pd.read_excel(file_path, sheet_name=0)
+            df = pd.read_excel(file_path, sheet_name=0, skiprows=9)
     else:
         st.error("Unsupported file format. Please upload an Excel file.")
         return None
@@ -24,8 +24,8 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
-            # Select only columns 7 to 25
-            df1 = df1.iloc[:, 6:25]
+            # Select only columns 9 to 30
+            df1 = df1.iloc[:, 8:30]
 
             # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
