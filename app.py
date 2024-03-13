@@ -81,9 +81,7 @@ def main():
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
                 text_values_list = text_values_df4.stack().tolist()
-                
-                st.header("Text Values in DataFrame 4 (Excluding 'nan')")
-                st.write(text_values_list)
+
                 
                 # Create a dictionary with specified keys
                 text_values_dict = {"Sales": [], "Gross Profit": [], "Incentives": [], "Chargeback": []}
@@ -97,7 +95,7 @@ def main():
                     elif 'D' in value and re.match(r'^\d', value):
                         text_values_dict["Chargeback"].append(value)
                 
-                st.header("Text Values Dictionary")
+                st.header("Output Dictionary")
                 st.write(text_values_dict)
             else:
                 st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
