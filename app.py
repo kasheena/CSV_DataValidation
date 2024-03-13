@@ -105,16 +105,16 @@ def main():
 
         st.header("PCL Mapping Criteria")
 
-            # Filter mismatched records
-            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code'])) or 
+        # Filter mismatched records
+        mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code'])) or 
                                                              ('cost' in str(row['Line Label']).lower() and ('E' in str(row['PCL code']) or 'D' in str(row['PCL code']))) or
                                                              (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code'])), axis=1))]
-            mismatched_records = mismatched_records.dropna()
+        mismatched_records = mismatched_records.dropna()
+        st.write(mismatched_records)
+        if mismatched_records.empty:
+            st.success("PCL mapping criteria passed")
+        else:
             st.write(mismatched_records)
-            if mismatched_records.empty:
-                st.success("PCL mapping criteria passed")
-            else:
-                st.write(mismatched_records)
 
 if __name__ == "__main__":
     main()
