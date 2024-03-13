@@ -93,15 +93,15 @@ def main():
                 st.header("Mismatched Values")
                 st.write(mismatched_values)
 
-        # Check if all records in df2 meet the PCL mapping criteria
-        pass_pcl_mapping_criteria = all('sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']) for index, row in df2.iterrows())
+        # Check if all records with 'sales' in Line Label meet the PCL mapping criteria
+        pass_pcl_mapping_criteria = all('sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']) for index, row in df2.iterrows() if 'sales' in str(row['Line Label']).lower())
 
         if pass_pcl_mapping_criteria:
-            st.success("All records in DataFrame 2 meet the PCL mapping criteria.")
+            st.success("All records with 'sales' in Line Label meet the PCL mapping criteria.")
         else:
-            st.error("Some records in DataFrame 2 do not meet the PCL mapping criteria.")
+            st.error("Some records with 'sales' in Line Label do not meet the PCL mapping criteria.")
             st.header("Mismatched Records")
-            mismatched_indices = [index for index, row in df2.iterrows() if not ('sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']))]
+            mismatched_indices = [index for index, row in df2.iterrows() if 'sales' in str(row['Line Label']).lower() and 'C' not in str(row['PCL code'])]
             st.write(df2.iloc[mismatched_indices])
 
 if __name__ == "__main__":
