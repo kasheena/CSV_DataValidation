@@ -33,28 +33,22 @@ def main():
             # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
 
-            st.header("DataFrame 1")
-            st.table(df1)
-
             # Create List 1.1 with only text values from DataFrame 1
             text_values_df1 = df1.select_dtypes(include=['object'])
             text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
 
-            st.header("Text Values in List 1.1 (Excluding 'nan')")
-            st.write(text_values_list_1_1)
-
             # Create dictionary 'input'
             input_dict = {}
             headers = text_values_list_1_1[:3]  # Get first three records as headers
             for header in headers:
                 if header == headers[0]:  # If it's the first header
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value]
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'C' in value]
                 elif header == headers[1]:  # If it's the second header
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'E' in value]
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'E' in value]
                 elif header == headers[2]:  # If it's the third header
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value]
+                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'G' in value]
 
             st.header("Input Dictionary")
             st.write(input_dict)
