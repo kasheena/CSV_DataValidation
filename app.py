@@ -17,6 +17,7 @@ def filter_columns(df):
     keywords = ['sales', 'gross profit', 'incentives']
     # Filter columns containing specified keywords
     filtered_columns = [col for col in df.columns if any(keyword.lower() in str(col).lower() for keyword in keywords)]
+    st.write("Filtered Columns:", filtered_columns)  # Debugging
     return df[filtered_columns]
 
 def main():
@@ -30,8 +31,13 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
+            st.header("Original DataFrame 1")
+            st.table(df1)  # Debugging
+
             # Filter columns containing specified keywords
             df1 = filter_columns(df1)
+            st.header("Filtered DataFrame 1")
+            st.table(df1)  # Debugging
 
             # Remove columns that are entirely null
             df1 = df1.dropna(axis=1, how='all')
@@ -39,7 +45,7 @@ def main():
             # Convert non-numeric columns to strings
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
             
-            st.header("DataFrame 1")
+            st.header("Final DataFrame 1")
             st.table(df1)
 
 if __name__ == "__main__":
