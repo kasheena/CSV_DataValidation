@@ -24,6 +24,9 @@ def main():
         df1 = read_excel_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
+            # Exclude the last 3 rows independently
+            df1 = df1.iloc[:-3]
+
             # Select only columns 9 to 30
             df1 = df1.iloc[:, 8:30]
 
