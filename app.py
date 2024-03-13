@@ -111,7 +111,7 @@ def main():
 
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code'])) or 
-                                                             ('cost' in str(row['Line Label']).lower() and ('E' in str(row['PCL code']) or 'D' in str(row['PCL code']))) or 
+                                                             ('cost' in str(row['Line Label']).lower() and ('E' in str(row['PCL code']) or 'D' in str(row['PCL code']))) and 
                                                              (('incent' in str(row['Line Label']).lower() or 'New Other Cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code'])), axis=1))]
             st.write(mismatched_records)
 
