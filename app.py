@@ -19,6 +19,9 @@ def main():
         df1 = read_file(uploaded_file1)
 
         if df1 is not None:
+            # Convert non-numeric columns to strings
+            df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
+            
             st.header("DataFrame 1")
             st.table(df1)
 
