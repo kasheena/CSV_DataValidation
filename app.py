@@ -27,9 +27,6 @@ def main():
             # Exclude the last 3 rows independently
             df1 = df1.iloc[:-3]
 
-            # Select only columns 9 to 30
-            df1 = df1.iloc[:, 8:30]
-
             # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
 
