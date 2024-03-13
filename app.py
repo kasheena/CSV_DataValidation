@@ -74,28 +74,19 @@ def main():
 
             # Filter out NaN values in DataFrame 1 before creating DataFrame 3
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+    
+            # Check if all values in input_dict exist anywhere in validation_result
+            input_values = [value for values in input_dict.values() for value in values]
+            all_values_exist = all(any(input_value in row.values for input_value in input_values) for _, row in validation_result.iterrows())
             
-            if not unmatched_records.empty:
-                # Create DataFrame 4 with only text values from DataFrame 3
-                text_values_df4 = unmatched_records.select_dtypes(include=['object'])
-                text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
-                text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_list = text_values_df4.stack().tolist()
+            if all_values_exist:
+                st.success("All values in input_dict exist somewhere in validation_result.")
+            else:
+                st.error("Not all values in input_dict exist somewhere in validation_result.")
                 
-                # Create a dictionary from text_values_list with specified keys
-                text_values_dict = {header: [value for value in text_values_list if re.match(r'^\d', value)] for header in headers}
-                
-                st.header("Text Values Dictionary")
-                st.write(text_values_dict)
-                
-                # Check if all values in input_dict exist anywhere in validation_result
-                input_values = [value for values in input_dict.values() for value in values]
-                all_values_exist = all(any(input_value in row.values for input_value in input_values) for _, row in validation_result.iterrows())
-                
-                if all_values_exist:
-                    st.success("All values in input_dict exist somewhere in validation_result.")
-                else:
-                    st.error("Not all values in input_dict exist somewhere in validation_result.")
+            st.header("Text Values Dictionary")
+            st.write(all_values_exist)
+            
 
             # if not unmatched_records.empty:
             #     # Create DataFrame 4 with only text values from DataFrame 3
