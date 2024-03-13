@@ -27,6 +27,9 @@ def main():
             # Select only columns 5 to 20
             df1 = df1.iloc[:, 4:20]
 
+            # Convert non-numeric data to string
+            df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
+
             st.header("Selected Columns from DataFrame 1")
             st.table(df1)
 
