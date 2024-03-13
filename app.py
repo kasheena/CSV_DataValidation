@@ -58,9 +58,9 @@ def main():
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_list = text_values_df4.values.flatten().tolist()
+                text_values_list = text_values_df4.values.flatten().tolist()[:100]
                 
-                st.header("Text Values in DataFrame 4")
+                st.header("Text Values in DataFrame 4 (First 100 elements)")
                 st.write(text_values_list)
             else:
                 st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
