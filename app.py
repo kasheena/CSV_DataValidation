@@ -36,6 +36,15 @@ def main():
             st.header("DataFrame 1")
             st.table(df1)
 
+            # Create List 1.1 with only text values from DataFrame 1
+            text_values_df1 = df1.select_dtypes(include=['object'])
+            text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
+            text_values_df1 = text_values_df1.dropna(axis=1, how='all')
+            text_values_list_1_1 = text_values_df1.stack().tolist()
+
+            st.header("Text Values in List 1.1 (Excluding 'nan')")
+            st.write(text_values_list_1_1)
+
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
 
