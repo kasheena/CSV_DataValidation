@@ -93,14 +93,13 @@ def main():
                 st.header("Mismatched Values")
                 st.write(mismatched_values)
 
-        # Additional functionality
-        if 'Line Label' in df2.columns and 'PCL code' in df2.columns:
-            sales_mapping = {}
-            for index, row in df2.iterrows():
-                if 'sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']):
-                    sales_mapping[row['Line Label']] = row['PCL code']
-            
-            st.header("Sales Mapping")
-            st.write(sales_mapping)
+        # Check if all records in df2 meet the PCL mapping criteria
+        pass_pcl_mapping_criteria = all('sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']) for index, row in df2.iterrows())
+
+        if pass_pcl_mapping_criteria:
+            st.success("All records in DataFrame 2 meet the PCL mapping criteria.")
+        else:
+            st.error("Some records in DataFrame 2 do not meet the PCL mapping criteria.")
+
 if __name__ == "__main__":
     main()
