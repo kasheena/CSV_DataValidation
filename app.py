@@ -76,16 +76,24 @@ def main():
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
             if not unmatched_records.empty:
+                # Initialize the headers to include
+                headers_to_include = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
+                
                 # Create DataFrame 4 with only text values from DataFrame 3
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_list = text_values_df4.stack().tolist()
+                
+                # Extract values for specified headers
+                text_values_list = []
+                for header in headers_to_include:
+                    if header in text_values_df4.columns:
+                        values = text_values_df4[header].tolist()
+                        text_values_list.extend(values)
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_list)
-            else:
-                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+
 
 if __name__ == "__main__":
     main()
