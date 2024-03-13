@@ -24,8 +24,8 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
-            # Select only columns 5 to 20
-            df1 = df1.iloc[:, 4:20]
+            # Select only columns 7 to 25
+            df1 = df1.iloc[:, 6:25]
 
             # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
