@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 
 def read_excel_file(file_path, sheet_name):
     if sheet_name:
@@ -43,11 +44,11 @@ def main():
             input_dict["Line Label"] = line_label_values  # Add values to 'Line Label' key
             for header in headers:
                 if header == headers[0]:  # If it's the first header
-                    input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and len(value) < 6]
+                    input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
                 elif header == headers[1]:  # If it's the second header
-                    input_dict["Gross Profit"] = [value for value in text_values_list_1_1[3:] if 'E' in value and len(value) < 6]
+                    input_dict["Gross Profit"] = [value for value in text_values_list_1_1[3:] if 'E' in value and re.match(r'^\d', value)]
                 elif header == headers[2]:  # If it's the third header
-                    input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and len(value) < 6]
+                    input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
 
             st.header("Input Dictionary")
             st.write(input_dict)
