@@ -10,10 +10,12 @@ def read_excel_file(file_path, sheet_name):
     return df
 
 def read_csv_file(file_path):
-    return pd.read_csv(file_path)
+    df = pd.read_csv(file_path)
+    return df
 
 def main():
     st.title("Data Validation App")
+
     st.sidebar.header("Upload Files")
     uploaded_file1 = st.sidebar.file_uploader("Upload Excel file for DataFrame 1", type=["xlsx", "xls"])
     uploaded_file2 = st.sidebar.file_uploader("Upload CSV file for DataFrame 2", type=["csv"])
@@ -23,21 +25,37 @@ def main():
         df1 = read_excel_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
+            # Exclude the last 3 rows independently
             df1 = df1.iloc[:-3]
+
+            # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
-            text_values_df1 = df1.select_dtypes(include=['object']).dropna(axis=1, how='all')
+
+            # Create List 1.1 with only text values from DataFrame 1
+            text_values_df1 = df1.select_dtypes(include=['object'])
+            text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
+            text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
 
+            # Initialize the input_dict
             input_dict = {}
+            
+            # Define the headers
             headers = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
+            
+            # Iterate through the headers
             for header in headers:
                 if header == "Sales":
+                    # Include values with 'C' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value and re.match(r'^\d', value)]
                 elif header == "Gross Profit":
+                    # Include values with 'E' or 'e+' and starting with a number
                     input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1 if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
                 elif header == "Incentives":
+                    # Include values with 'G' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value and re.match(r'^\d', value)]
                 elif header == "Chargeback":
+                    # Include values with 'D' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
 
             st.header("Input Dictionary")
@@ -45,32 +63,51 @@ def main():
 
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
-
+    
         if df2 is not None:
             st.header("DataFrame 2")
             st.table(df2)
 
-            df2_values = set(df2['PCL code'].dropna().values)
-            mapping_criteria = {
-                "Sales": ("C", lambda x: 'sales' in x.lower() or 'customer' in x.lower()),
-                "Cost": ("E/D", lambda x: 'cost' in x.lower()),
-                "Incentives": ("G", lambda x: 'incent' in x.lower() or 'new other cost' in x.lower())
-            }
-            mismatched_records = df2[~df2.apply(lambda row: any(pc in str(row['PCL code']) and criteria(str(row['Line Label'])) for pc, criteria in mapping_criteria.values()), axis=1)]
+            # PCL Mapping Criteria 
+            # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
+            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code']) for index, row in df2.iterrows())
 
+            # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
+            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row['PCL code']) or 'D' in str(row['PCL code'])) for index, row in df2.iterrows())
+
+            # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
+            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code']) for index, row in df2.iterrows())
+
+            st.header("PCL Mapping Criteria")
+
+            # Filter mismatched records
+            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code'])) or 
+                                                                ('cost' in str(row['Line Label']).lower() and ('E' in str(row['PCL code']) or 'D' in str(row['PCL code']))) or
+                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code'])), axis=1))]
+            mismatched_records = mismatched_records.dropna()
             if mismatched_records.empty:
                 st.success("PCL mapping criteria passed")
             else:
                 st.write(mismatched_records)
 
     st.write("Data Validation")
+    # Extract unique values from df2['PCL code']
     df2_values = set(df2['PCL code'].dropna().values)
+
+    # Check for validation
     validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+
+    # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+    unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+
+    # Check for values in input_dict that do not match df2_values
     mismatched_values = {}
     for header, values in input_dict.items():
         for value in values:
             if value not in df2_values:
-                mismatched_values.setdefault(header, []).append(value)
+                if header not in mismatched_values:
+                    mismatched_values[header] = []
+                mismatched_values[header].append(value)
 
     if not mismatched_values:
         st.success("All values in input_dict exist in df2_values.")
