@@ -45,43 +45,18 @@ def main():
             st.header("Text Values in List 1.1 (Excluding 'nan')")
             st.write(text_values_list_1_1)
 
-            # Create input dictionary
-            input_dict = {text_values_list_1_1[0]: text_values_list_1_1[1:4],
-                          text_values_list_1_1[4]: [value for value in text_values_list_1_1[4:] if 'C' in value],
-                          text_values_list_1_1[5]: [value for value in text_values_list_1_1[4:] if 'E' in value],
-                          text_values_list_1_1[6]: [value for value in text_values_list_1_1[4:] if 'G' in value]}
+            # Create dictionary 'input'
+            input_dict = {}
+            headers = text_values_list_1_1[:3]  # Get first three records as headers
+            for header in headers:
+                if header == headers[0]:  # If it's the first header
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value]
+                elif header == headers[1]:  # If it's the second header
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'E' in value]
+                elif header == headers[2]:  # If it's the third header
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value]
 
             st.header("Input Dictionary")
             st.write(input_dict)
 
-    if uploaded_file2:
-        df2 = read_csv_file(uploaded_file2)
-
-        if df2 is not None:
-            st.header("DataFrame 2")
-            st.table(df2)
-
-            # Check for validation
-            df2_values = df2['PCL code'].dropna().values
-            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
-
-            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
-
-            if not unmatched_records.empty:
-                st.header("Records not present in DataFrame 2")
-                st.table(unmatched_records)
-                
-                # Create DataFrame 4 with only text values from DataFrame 3
-                text_values_df4 = unmatched_records.select_dtypes(include=['object'])
-                text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
-                text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_list = text_values_df4.stack().tolist()
-                
-                st.header("Text Values in DataFrame 4 (Excluding 'nan')")
-                st.write(text_values_list)
-            else:
-                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
-
-if __name__ == "__main__":
-    main()
+ 
