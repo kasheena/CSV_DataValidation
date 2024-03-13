@@ -45,6 +45,15 @@ def main():
             st.header("Text Values in List 1.1 (Excluding 'nan')")
             st.write(text_values_list_1_1)
 
+            # Create input dictionary
+            input_dict = {text_values_list_1_1[0]: text_values_list_1_1[1:4],
+                          text_values_list_1_1[4]: [value for value in text_values_list_1_1[4:] if 'C' in value],
+                          text_values_list_1_1[5]: [value for value in text_values_list_1_1[4:] if 'E' in value],
+                          text_values_list_1_1[6]: [value for value in text_values_list_1_1[4:] if 'G' in value]}
+
+            st.header("Input Dictionary")
+            st.write(input_dict)
+
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
 
