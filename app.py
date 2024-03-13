@@ -45,22 +45,15 @@ def main():
             
             # Iterate through the headers
             for header in headers:
+                # Include values with corresponding header letters and starting with a number
                 if header == "Sales":
-                    # Include values with 'C' and starting with a number
-                    sales_values = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
-                    input_dict[header] = sales_values
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value and re.match(r'^\d', value)]
                 elif header == "Gross Profit":
-                    # Include values with 'E' or 'e+' and starting with a number
-                    gross_profit_values = [value.upper().replace('E+', 'E') for value in text_values_list_1_1[3:] if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
-                    input_dict[header] = gross_profit_values
+                    input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1 if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
                 elif header == "Incentives":
-                    # Include values with 'G' and starting with a number
-                    incentives_values = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
-                    input_dict[header] = incentives_values
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value and re.match(r'^\d', value)]
                 elif header == "Chargeback":
-                    # Include values with 'D' and starting with a number
-                    chargeback_values = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
-                    input_dict[header] = chargeback_values
+                    input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
 
             st.header("Input Dictionary")
             st.write(input_dict)
@@ -89,4 +82,7 @@ def main():
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_list)
             else:
-                st.success("All valid records from DataFrame 1 are present in DataFrame 
+                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+
+if __name__ == "__main__":
+    main()
