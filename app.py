@@ -51,7 +51,7 @@ def main():
             unmatched_records = df1[validation_result.any(axis=1)]
 
             # Filter DataFrame 3 to include only text values
-            text_records_df3 = unmatched_records.select_dtypes(include=['object'])
+            text_records_df3 = unmatched_records.applymap(lambda x: x if isinstance(x, str) else '')
 
             if not text_records_df3.empty:
                 st.header("Records not present in DataFrame 2")
