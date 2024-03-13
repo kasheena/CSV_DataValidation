@@ -45,12 +45,13 @@ def main():
             for header in headers:
                 if header == headers[0]:  # If it's the first header
                     input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
+                elif header == headers[3]:  # If it's the fourth header
+                    input_dict["Chargeback"] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
                 elif header == headers[1]:  # If it's the second header
                     input_dict["Gross Profit"] = [value for value in text_values_list_1_1[3:] if 'E' in value and re.match(r'^\d', value)]
                 elif header == headers[2]:  # If it's the third header
                     input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
-                elif header == headers[3]:  # If it's the fourth header
-                    input_dict["Chargeback"] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
+
                     
             st.header("Input Dictionary")
             st.write(input_dict)
