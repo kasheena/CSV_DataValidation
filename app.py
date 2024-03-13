@@ -100,6 +100,9 @@ def main():
             st.success("All records in DataFrame 2 meet the PCL mapping criteria.")
         else:
             st.error("Some records in DataFrame 2 do not meet the PCL mapping criteria.")
+            st.header("Mismatched Records")
+            mismatched_indices = [index for index, row in df2.iterrows() if not ('sales' in str(row['Line Label']).lower() and 'C' in str(row['PCL code']))]
+            st.write(df2.iloc[mismatched_indices])
 
 if __name__ == "__main__":
     main()
