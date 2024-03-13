@@ -33,9 +33,6 @@ def main():
             # Convert non-numeric data to string
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
 
-            # Hardcode headers for DataFrame 1
-            df1.columns = ["SALES", "GROSS PROFIT", "INCENTIVES"]
-
             st.header("DataFrame 1")
             st.table(df1)
 
