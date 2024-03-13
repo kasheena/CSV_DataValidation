@@ -50,9 +50,12 @@ def main():
             # Filter out matching records from DataFrame 1 to create DataFrame 3
             unmatched_records = df1[validation_result.any(axis=1)]
 
-            if not unmatched_records.empty:
+            # Filter DataFrame 3 to include only text values
+            text_records_df3 = unmatched_records.select_dtypes(include=['object'])
+
+            if not text_records_df3.empty:
                 st.header("Records not present in DataFrame 2")
-                st.table(unmatched_records)
+                st.table(text_records_df3)
             else:
                 st.success("All records from DataFrame 1 are present in DataFrame 2.")
 
