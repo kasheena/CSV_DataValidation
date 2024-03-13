@@ -13,13 +13,6 @@ def read_file(file_path, sheet_name):
         return None
     return df
 
-def filter_columns(df):
-    keywords = ['sales', 'gross profit', 'incentives']
-    # Filter columns containing specified keywords
-    filtered_columns = [col for col in df.columns if any(keyword.lower() in str(col).lower() for keyword in keywords)]
-    st.write("Filtered Columns:", filtered_columns)  # Debugging
-    return df[filtered_columns]
-
 def main():
     st.title("Data Validation App")
 
@@ -31,15 +24,10 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
-            st.header("Original DataFrame 1")
-            st.table(df1)  # Debugging
+            # Select only columns 6 and 10
+            df1 = df1.iloc[:, [5, 9]]
 
-            # Filter columns containing specified keywords
-            df1 = filter_columns(df1)
-            st.header("Filtered DataFrame 1")
-            st.table(df1)  # Debugging
-            
-            st.header("Final DataFrame 1")
+            st.header("Selected Columns from DataFrame 1")
             st.table(df1)
 
 if __name__ == "__main__":
