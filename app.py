@@ -84,21 +84,11 @@ def main():
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_list)
-
                 
-                # Create a dictionary with specified keys
-                text_values_dict = {"Sales": [], "Gross Profit": [], "Incentives": [], "Chargeback": []}
-                for value in text_values_list:
-                    if 'C' in value and re.match(r'^\d', value):
-                        text_values_dict["Sales"].append(value)
-                    elif ('E' in value or 'e+' in value) and re.match(r'^\d', value):
-                        text_values_dict["Gross Profit"].append(value.upper().replace('E+', 'E'))
-                    elif 'G' in value and re.match(r'^\d', value):
-                        text_values_dict["Incentives"].append(value)
-                    elif 'D' in value and re.match(r'^\d', value):
-                        text_values_dict["Chargeback"].append(value)
+                # Create a dictionary from text_values_list with specified keys
+                text_values_dict = {header: [value for value in text_values_list if re.match(r'^\d', value)] for header in headers}
                 
-                st.header("Output Dictionary")
+                st.header("Text Values Dictionary")
                 st.write(text_values_dict)
             else:
                 st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
