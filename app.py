@@ -13,6 +13,12 @@ def read_file(file_path, sheet_name):
         return None
     return df
 
+def filter_columns(df):
+    keywords = ['sales', 'gross profit', 'incentives']
+    # Filter columns containing specified keywords
+    filtered_columns = [col for col in df.columns if any(keyword in col.lower() for keyword in keywords)]
+    return df[filtered_columns]
+
 def main():
     st.title("Data Validation App")
 
@@ -24,6 +30,9 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
+            # Filter columns containing specified keywords
+            df1 = filter_columns(df1)
+
             # Remove columns that are entirely null
             df1 = df1.dropna(axis=1, how='all')
 
