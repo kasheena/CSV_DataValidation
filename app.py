@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import PyPDF2
 from io import BytesIO
+import warnings
+
+# Suppress PdfReadWarning messages
+warnings.filterwarnings("ignore", category=UserWarning)
 
 def read_pdf(uploaded_file):
     tables = []
