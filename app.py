@@ -80,21 +80,21 @@ def main():
                 text_values_dict = text_values_df4.to_dict(orient='list')
             
                 # Initialize input_dict with headers
-                input_dict = {header: [] for header in headers}
+                text_values_dict = {header: [] for header in headers}
             
                 # Iterate over text_values_dict and apply conditions for each header
                 for header in headers:
                     if header == "Sales":
-                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'C' in value and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'C' in value and re.match(r'^\d', value)]
                     elif header == "Gross Profit":
-                        input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_dict.get(header, []) if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_dict.get(header, []) if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
                     elif header == "Incentives":
-                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'G' in value and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'G' in value and re.match(r'^\d', value)]
                     elif header == "Chargeback":
-                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'D' in value and re.match(r'^\d', value)]  
+                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'D' in value and re.match(r'^\d', value)]  
             
-                st.header("Input Dictionary")
-                st.write(input_dict)
+                st.header("Output Dictionary")
+                st.write(text_values_dict)
             else:
                 st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
 
