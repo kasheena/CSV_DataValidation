@@ -47,16 +47,20 @@ def main():
             for header in headers:
                 if header == "Sales":
                     # Include values with 'C' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
+                    sales_values = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
+                    input_dict[header] = sales_values
                 elif header == "Gross Profit":
                     # Include values with 'E' or 'e+' and starting with a number
-                    input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1[3:] if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+                    gross_profit_values = [value.upper().replace('E+', 'E') for value in text_values_list_1_1[3:] if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+                    input_dict[header] = gross_profit_values
                 elif header == "Incentives":
                     # Include values with 'G' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
+                    incentives_values = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
+                    input_dict[header] = incentives_values
                 elif header == "Chargeback":
                     # Include values with 'D' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
+                    chargeback_values = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
+                    input_dict[header] = chargeback_values
 
             st.header("Input Dictionary")
             st.write(input_dict)
@@ -76,24 +80,13 @@ def main():
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
             if not unmatched_records.empty:
-                # Initialize the headers to include
-                headers_to_include = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
-                
                 # Create DataFrame 4 with only text values from DataFrame 3
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                
-                # Extract values for specified headers
-                text_values_list = []
-                for header in headers_to_include:
-                    if header in text_values_df4.columns:
-                        values = text_values_df4[header].tolist()
-                        text_values_list.extend(values)
+                text_values_list = text_values_df4.stack().tolist()
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_list)
-
-
-if __name__ == "__main__":
-    main()
+            else:
+                st.success("All valid records from DataFrame 1 are present in DataFrame 
