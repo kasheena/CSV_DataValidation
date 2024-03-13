@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
 def read_excel_file(file_path, sheet_name):
     if sheet_name:
@@ -45,7 +44,8 @@ def main():
             df2_values = df2['PCL code'].dropna().values
             validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
 
-            unmatched_records = df1[~validation_result.any(axis=1)]
+            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
             if not unmatched_records.empty:
                 st.header("Records not present in DataFrame 2")
