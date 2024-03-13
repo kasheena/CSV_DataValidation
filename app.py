@@ -59,4 +59,34 @@ def main():
             st.header("Input Dictionary")
             st.write(input_dict)
 
- 
+    if uploaded_file2:
+        df2 = read_csv_file(uploaded_file2)
+
+        if df2 is not None:
+            st.header("DataFrame 2")
+            st.table(df2)
+
+            # Check for validation
+            df2_values = df2['PCL code'].dropna().values
+            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+
+            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+
+            if not unmatched_records.empty:
+                st.header("Records not present in DataFrame 2")
+                st.table(unmatched_records)
+                
+                # Create DataFrame 4 with only text values from DataFrame 3
+                text_values_df4 = unmatched_records.select_dtypes(include=['object'])
+                text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
+                text_values_df4 = text_values_df4.dropna(axis=1, how='all')
+                text_values_list = text_values_df4.stack().tolist()
+                
+                st.header("Text Values in DataFrame 4 (Excluding 'nan')")
+                st.write(text_values_list)
+            else:
+                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+
+if __name__ == "__main__":
+    main()
