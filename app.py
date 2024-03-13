@@ -77,16 +77,24 @@ def main():
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                # Manually set the keys and exclude null values
-                text_values_dict = {
-                    "Sales": [value for value in text_values_df4["Sales"] if value and not pd.isna(value)],
-                    "Gross Profit": [value for value in text_values_df4["Gross Profit"] if value and not pd.isna(value)],
-                    "Incentives": [value for value in text_values_df4["Incentives"] if value and not pd.isna(value)],
-                    "Chargeback": [value for value in text_values_df4["Chargeback"] if value and not pd.isna(value)]
-                }
-                
-                st.header("Text Values in DataFrame 4 (Excluding 'nan')")
-                st.write(text_values_dict)
+                text_values_dict = text_values_df4.to_dict(orient='list')
+            
+                # Initialize input_dict with headers
+                input_dict = {header: [] for header in headers}
+            
+                # Iterate over text_values_dict and apply conditions for each header
+                for header in headers:
+                    if header == "Sales":
+                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'C' in value and re.match(r'^\d', value)]
+                    elif header == "Gross Profit":
+                        input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_dict.get(header, []) if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+                    elif header == "Incentives":
+                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'G' in value and re.match(r'^\d', value)]
+                    elif header == "Chargeback":
+                        input_dict[header] = [value for value in text_values_dict.get(header, []) if 'D' in value and re.match(r'^\d', value)]  
+            
+                st.header("Input Dictionary")
+                st.write(input_dict)
             else:
                 st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
 
