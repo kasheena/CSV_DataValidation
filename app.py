@@ -1,19 +1,23 @@
 import streamlit as st
 import pandas as pd
-import pdfplumber
+import PyPDF2
+import io
 
 def read_pdf(file_path):
-    with pdfplumber.open(file_path) as pdf:
-        df_list = []
-        for page in pdf.pages:
-            tables = page.extract_tables()
-            for table in tables:
-                df_list.append(pd.DataFrame(table))
-                st.write(pd.DataFrame(table))  # Print extracted table
-        if not df_list:
-            st.error("No tables found in the PDF file.")
-            return None
-        df = pd.concat(df_list, ignore_index=True)
+    tables = []
+    with open(file_path, "rb") as f:
+        reader = PyPDF2.PdfFileReader(f)
+        for page_num in range(reader.numPages):
+            page = reader.getPage(page_num)
+            text = page.extractText()
+            # Extracting tables based on some patterns in the text (this is a simplified approach)
+            table = [line.split() for line in text.split("\n") if line.strip()]
+            if table:
+                tables.append(pd.DataFrame(table))
+    if not tables:
+        st.error("No tables found in the PDF file.")
+        return None
+    df = pd.concat(tables, ignore_index=True)
     return df
 
 def read_file(file_path):
