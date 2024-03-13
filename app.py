@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 def read_excel_file(file_path, sheet_name):
     if sheet_name:
@@ -41,14 +42,16 @@ def main():
             st.table(df2)
 
             # Check for validation
-            validation_result = df1.isin(df2.values.flatten())
+            df2_values = df2['PCL code'].dropna().values
+            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+
             unmatched_records = df1[~validation_result.any(axis=1)]
 
             if not unmatched_records.empty:
                 st.header("Records not present in DataFrame 2")
                 st.table(unmatched_records)
             else:
-                st.success("All records from DataFrame 1 are present in DataFrame 2.")
+                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
 
 if __name__ == "__main__":
     main()
