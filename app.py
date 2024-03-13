@@ -49,15 +49,14 @@ def main():
                     # Include values with 'C' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1[3:] if 'C' in value and re.match(r'^\d', value)]
                 elif header == "Gross Profit":
-                    # Include values with 'E' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1[3:] if 'E' in value and re.match(r'^\d', value)]
+                    # Include values with 'E' or '+e' and starting with a number
+                    input_dict[header] = [value.upper() for value in text_values_list_1_1[3:] if ('E' in value or '+e' in value) and re.match(r'^\d', value)]
                 elif header == "Incentives":
                     # Include values with 'G' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1[3:] if 'G' in value and re.match(r'^\d', value)]
                 elif header == "Chargeback":
                     # Include values with 'D' and starting with a number
                     input_dict[header] = [value for value in text_values_list_1_1[3:] if 'D' in value and re.match(r'^\d', value)]
-
 
             st.header("Input Dictionary")
             st.write(input_dict)
