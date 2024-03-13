@@ -99,33 +99,33 @@ def main():
             st.header("DataFrame 2")
             st.table(df2)
     
+            # Extract unique values from df2['PCL code']
+            df2_values = set(df2['PCL code'].dropna().values)
+    
             # Check for validation
-            df2_values = df2['PCL code'].dropna().values
             validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
-            st.write(df2_values)
-            
+    
             # Filter out NaN values in DataFrame 1 before creating DataFrame 3
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
     
-            # Check if all values in input_dict exist anywhere in validation_result
-            input_values = [value for values in input_dict.values() for value in values]
+            # Check for values in input_dict that do not match df2_values
             mismatched_values = {}
-            all_values_exist = True
-            for _, row in validation_result.iterrows():
-                for input_value in input_values:
-                    if input_value not in row.values:
-                        all_values_exist = False
-                        mismatched_values[input_value] = "Not Found"
+            for header, values in input_dict.items():
+                for value in values:
+                    if value not in df2_values:
+                        if header not in mismatched_values:
+                            mismatched_values[header] = []
+                        mismatched_values[header].append(value)
     
-            if all_values_exist:
-                st.success("All values in input_dict exist somewhere in validation_result.")
+            if not mismatched_values:
+                st.success("All values in input_dict exist in df2_values.")
             else:
-                st.error("Not all values in input_dict exist somewhere in validation_result.")
+                st.error("Some values in input_dict do not exist in df2_values.")
                 st.header("Mismatched Values")
                 st.write(mismatched_values)
                     
             st.header("Text Values Dictionary")
-            st.write(all_values_exist)
+            st.write(validation_result)
 
 
 if __name__ == "__main__":
