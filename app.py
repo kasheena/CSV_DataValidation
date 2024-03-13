@@ -77,22 +77,21 @@ def main():
                 text_values_df4 = unmatched_records.select_dtypes(include=['object'])
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
-                text_values_dict = text_values_df4.to_dict(orient='list')
-            
-                # Initialize input_dict with headers
+                
+                # Initialize text_values_dict with headers
                 text_values_dict = {header: [] for header in headers}
-            
+                
                 # Iterate over text_values_dict and apply conditions for each header
                 for header in headers:
                     if header == "Sales":
-                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'C' in value and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value for value in text_values_df4[header] if 'C' in value and re.match(r'^\d', value)]
                     elif header == "Gross Profit":
-                        text_values_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_dict.get(header, []) if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_df4[header] if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
                     elif header == "Incentives":
-                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'G' in value and re.match(r'^\d', value)]
+                        text_values_dict[header] = [value for value in text_values_df4[header] if 'G' in value and re.match(r'^\d', value)]
                     elif header == "Chargeback":
-                        text_values_dict[header] = [value for value in text_values_dict.get(header, []) if 'D' in value and re.match(r'^\d', value)]  
-            
+                        text_values_dict[header] = [value for value in text_values_df4[header] if 'D' in value and re.match(r'^\d', value)]  
+
                 st.header("Output Dictionary")
                 st.write(text_values_dict)
             else:
