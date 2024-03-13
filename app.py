@@ -102,7 +102,8 @@ def main():
             # Check for validation
             df2_values = df2['PCL code'].dropna().values
             validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
-    
+            st.write(df2_values)
+            
             # Filter out NaN values in DataFrame 1 before creating DataFrame 3
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
     
@@ -110,7 +111,7 @@ def main():
             input_values = [value for values in input_dict.values() for value in values]
             mismatched_values = {}
             all_values_exist = True
-            for _, row in df2_values.iterrows():
+            for _, row in validation_result.iterrows():
                 for input_value in input_values:
                     if input_value not in row.values:
                         all_values_exist = False
