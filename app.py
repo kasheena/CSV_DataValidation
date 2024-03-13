@@ -9,6 +9,7 @@ def read_pdf(file_path):
             tables = page.extract_tables()
             for table in tables:
                 df_list.append(pd.DataFrame(table))
+                st.write(pd.DataFrame(table))  # Print extracted table
         if not df_list:
             st.error("No tables found in the PDF file.")
             return None
