@@ -102,29 +102,24 @@ def main():
             # Check for validation
             df2_values = df2['PCL code'].dropna().values
             validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+            st.write(validation_result)
     
             # Filter out NaN values in DataFrame 1 before creating DataFrame 3
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
     
             # Check if all values in input_dict exist anywhere in validation_result
             input_values = [value for values in input_dict.values() for value in values]
-            mismatched_values = {}
-            all_values_exist = True
-            for _, row in validation_result.iterrows():
-                for input_value in input_values:
-                    if input_value not in row.values:
-                        all_values_exist = False
-                        mismatched_values[input_value] = "Not Found"
+            unmatched_values = [input_value for input_value in input_values if not any(input_value in row.values for _, row in validation_result.iterrows())]
     
-            if all_values_exist:
-                st.success("All values in input_dict exist somewhere in validation_result.")
+            if unmatched_values:
+                st.error("The following values in input_dict do not exist anywhere in validation_result:")
+                st.write(unmatched_values)
             else:
-                st.error("Not all values in input_dict exist somewhere in validation_result.")
-                st.header("Mismatched Values")
-                st.write(mismatched_values)
-                    
+                st.success("All values in input_dict exist somewhere in validation_result.")
+    
             st.header("Text Values Dictionary")
-            st.write(all_values_exist)
+            st.write(unmatched_values)
+
 
 if __name__ == "__main__":
     main()
