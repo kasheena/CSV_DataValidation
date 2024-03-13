@@ -78,6 +78,9 @@ def main():
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
                 
+                # Print the column names to debug
+                print("Column names in text_values_df4:", text_values_df4.columns)
+                
                 # Initialize text_values_dict with headers
                 text_values_dict = {header: [] for header in headers}
                 
