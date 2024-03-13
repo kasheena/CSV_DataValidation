@@ -81,6 +81,9 @@ def main():
                 text_values_df4 = text_values_df4.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
                 text_values_df4 = text_values_df4.dropna(axis=1, how='all')
                 text_values_list = text_values_df4.stack().tolist()
+                
+                st.header("Text Values in DataFrame 4 (Excluding 'nan')")
+                st.write(text_values_list)
 
                 
                 # Create a dictionary with specified keys
