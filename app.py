@@ -31,7 +31,7 @@ def main():
             df1 = df1.iloc[:, 8:30]
 
             # Convert non-numeric data to string
-            df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
+            df1 = df1.applymap(str)
 
             st.header("DataFrame 1")
             st.table(df1)
@@ -44,17 +44,17 @@ def main():
             st.table(df2)
 
             # Check for validation
-            df2_values = df2['PCL code'].dropna().values
-            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+            df2_values = df2['PCL code'].values
+            validation_result = df1.applymap(lambda x: x not in df2_values)
 
-            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+            # Filter out matching records from DataFrame 1 to create DataFrame 3
+            unmatched_records = df1[validation_result.any(axis=1)]
 
             if not unmatched_records.empty:
                 st.header("Records not present in DataFrame 2")
                 st.table(unmatched_records)
             else:
-                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+                st.success("All records from DataFrame 1 are present in DataFrame 2.")
 
 if __name__ == "__main__":
     main()
