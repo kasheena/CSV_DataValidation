@@ -40,5 +40,15 @@ def main():
             st.header("DataFrame 2")
             st.table(df2)
 
+            # Check for validation
+            validation_result = df1.isin(df2.values.flatten())
+            unmatched_records = df1[~validation_result.any(axis=1)]
+
+            if not unmatched_records.empty:
+                st.header("Records not present in DataFrame 2")
+                st.table(unmatched_records)
+            else:
+                st.success("All records from DataFrame 1 are present in DataFrame 2.")
+
 if __name__ == "__main__":
     main()
