@@ -108,19 +108,23 @@ def main():
     
             # Check if all values in input_dict exist anywhere in validation_result
             input_values = [value for values in input_dict.values() for value in values]
-            unmatched_values = []
-    
-            for index, row in validation_result.iterrows():
+            mismatched_values = {}
+            all_values_exist = True
+            for _, row in validation_result.iterrows():
                 for input_value in input_values:
                     if input_value not in row.values:
-                        unmatched_values.append(input_value)
+                        all_values_exist = False
+                        mismatched_values[input_value] = "Not Found"
     
-            if unmatched_values:
-                st.error("The following values from input_dict do not exist anywhere in validation_result:")
-                st.write(unmatched_values)
-            else:
+            if all_values_exist:
                 st.success("All values in input_dict exist somewhere in validation_result.")
-
+            else:
+                st.error("Not all values in input_dict exist somewhere in validation_result.")
+                st.header("Mismatched Values")
+                st.write(mismatched_values)
+                    
+            st.header("Text Values Dictionary")
+            st.write(all_values_exist)
 
 if __name__ == "__main__":
     main()
