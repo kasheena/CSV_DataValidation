@@ -38,9 +38,6 @@ def main():
             df1 = filter_columns(df1)
             st.header("Filtered DataFrame 1")
             st.table(df1)  # Debugging
-
-            # Convert non-numeric columns to strings
-            df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
             
             st.header("Final DataFrame 1")
             st.table(df1)
