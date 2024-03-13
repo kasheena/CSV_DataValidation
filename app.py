@@ -103,11 +103,7 @@ def main():
         # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
         pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code']) for index, row in df2.iterrows())
 
-        if pass_sales_criteria and pass_cost_criteria and pass_incent_criteria:
-            st.success("PCL mapping criteria passed.")
-        else:
-            st.error("PCL mapping criteria not passed for some records.")
-            st.header("Mismatched Records")
+        st.header("PCL Mapping Criteria")
 
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row['PCL code'])) or 
@@ -115,6 +111,10 @@ def main():
                                                              (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row['PCL code'])), axis=1))]
             mismatched_records = mismatched_records.dropna()
             st.write(mismatched_records)
+            if mismatched_records.empty:
+                st.success("PCL mapping criteria passed")
+            else:
+                st.write(mismatched_records)
 
 if __name__ == "__main__":
     main()
