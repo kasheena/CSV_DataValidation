@@ -39,9 +39,6 @@ def main():
             st.header("Filtered DataFrame 1")
             st.table(df1)  # Debugging
 
-            # Remove columns that are entirely null
-            df1 = df1.dropna(axis=1, how='all')
-
             # Convert non-numeric columns to strings
             df1 = df1.applymap(lambda x: str(x) if not pd.api.types.is_numeric_dtype(x) else x)
             
