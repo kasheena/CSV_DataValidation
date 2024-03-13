@@ -24,8 +24,8 @@ def main():
         df1 = read_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
-            # Select only columns 6 and 10
-            df1 = df1.iloc[:, [5, 9]]
+            # Select only columns 5 to 20
+            df1 = df1.iloc[:, 4:20]
 
             st.header("Selected Columns from DataFrame 1")
             st.table(df1)
