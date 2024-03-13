@@ -61,33 +61,20 @@ def main():
             st.header("Input Dictionary")
             st.write(input_dict)
 
-    if uploaded_file2:
-        df2 = read_csv_file(uploaded_file2)
+    # if uploaded_file2:
+    #     df2 = read_csv_file(uploaded_file2)
 
-        if df2 is not None:
-            st.header("DataFrame 2")
-            st.table(df2)
+    #     if df2 is not None:
+    #         st.header("DataFrame 2")
+    #         st.table(df2)
 
-            # Check for validation
-            df2_values = df2['PCL code'].dropna().values
-            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+    #         # Check for validation
+    #         df2_values = df2['PCL code'].dropna().values
+    #         validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
 
-            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
-    
-            # Check if all values in input_dict exist anywhere in validation_result
-            input_values = [value for values in input_dict.values() for value in values]
-            all_values_exist = all(any(input_value in row.values for input_value in input_values) for _, row in validation_result.iterrows())
+    #         # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+    #         unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
             
-            if all_values_exist:
-                st.success("All values in input_dict exist somewhere in validation_result.")
-            else:
-                st.error("Not all values in input_dict exist somewhere in validation_result.")
-                
-            st.header("Text Values Dictionary")
-            st.write(all_values_exist)
-            
-
             # if not unmatched_records.empty:
             #     # Create DataFrame 4 with only text values from DataFrame 3
             #     text_values_df4 = unmatched_records.select_dtypes(include=['object'])
@@ -105,6 +92,35 @@ def main():
             #     st.write(text_values_dict)
             # else:
             #     st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+    if uploaded_file2:
+        df2 = read_csv_file(uploaded_file2)
+    
+        if df2 is not None:
+            st.header("DataFrame 2")
+            st.table(df2)
+    
+            # Check for validation
+            df2_values = df2['PCL code'].dropna().values
+            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+    
+            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+    
+            # Check if all values in input_dict exist anywhere in validation_result
+            input_values = [value for values in input_dict.values() for value in values]
+            unmatched_values = []
+    
+            for index, row in validation_result.iterrows():
+                for input_value in input_values:
+                    if input_value not in row.values:
+                        unmatched_values.append(input_value)
+    
+            if unmatched_values:
+                st.error("The following values from input_dict do not exist anywhere in validation_result:")
+                st.write(unmatched_values)
+            else:
+                st.success("All values in input_dict exist somewhere in validation_result.")
+
 
 if __name__ == "__main__":
     main()
