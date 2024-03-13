@@ -87,8 +87,8 @@ def main():
                 
                 st.header("Text Values in DataFrame 4 (Excluding 'nan')")
                 st.write(text_values_dict)
-                else:
-                    st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
+            else:
+                st.success("All valid records from DataFrame 1 are present in DataFrame 2.")
 
 if __name__ == "__main__":
     main()
