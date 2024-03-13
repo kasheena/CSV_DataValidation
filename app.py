@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 import PyPDF2
-import io
+from io import BytesIO
 
-def read_pdf(file_path):
+def read_pdf(uploaded_file):
     tables = []
-    with open(file_path, "rb") as f:
+    with BytesIO(uploaded_file.getvalue()) as f:
         reader = PyPDF2.PdfFileReader(f)
         for page_num in range(reader.numPages):
             page = reader.getPage(page_num)
