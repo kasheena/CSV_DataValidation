@@ -39,6 +39,7 @@ def main():
             # Create dictionary 'input'
             input_dict = {}
             headers = text_values_list_1_1[:3]  # Get first three records as headers
+            line_label_values = []  # Store values for 'Line Label' key
             for header in headers:
                 if header == headers[0]:  # If it's the first header
                     input_dict["Sales"] = [value for value in text_values_list_1_1[3:] if 'C' in value and len(value) < 6]
@@ -47,7 +48,9 @@ def main():
                 elif header == headers[2]:  # If it's the third header
                     input_dict["Incentives"] = [value for value in text_values_list_1_1[3:] if 'G' in value and len(value) < 6]
                 else:
-                    input_dict["Line Label"] = [value for value in text_values_list_1_1[3:] if value == 'New']
+                    line_label_values.extend([value for value in text_values_list_1_1[3:] if value == 'New'])
+
+            input_dict["Line Label"] = line_label_values  # Add values to 'Line Label' key
 
             st.header("Input Dictionary")
             st.write(input_dict)
