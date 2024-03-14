@@ -80,8 +80,8 @@ def main():
     
             st.write("Data Validation")
             # Extract unique values from df2['PCL code'] or df2['PCL codes']
-            pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
-            if pcl_code_column is not None:
+            pcl_code_column = [col for col in df2.columns if 'PCL' in col][0] if any('PCL' in col for col in df2.columns) else None
+            if pcl_code_column:
                 df2_values = set(df2[pcl_code_column].dropna().values)
             
                 # Check if all records in text_values_list_1_1 are available in pcl_code_column
@@ -97,4 +97,4 @@ def main():
                 st.error("No column containing 'PCL' found in DataFrame 2.")
 
 if __name__ == "__main__":
-    main()  
+    main()
