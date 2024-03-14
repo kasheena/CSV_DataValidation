@@ -43,20 +43,25 @@ def main():
             # Define the headers
             headers = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
             
-            # Iterate through the headers
-            for header in headers:
-                if header == "Sales":
-                    # Include values with 'C' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value and re.match(r'^\d', value)]
-                elif header == "Gross Profit":
-                    # Include values with 'E' or 'e+' and starting with a number
-                    input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1 if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
-                elif header == "Incentives":
-                    # Include values with 'G' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value and re.match(r'^\d', value)]
-                elif header == "Chargeback":
-                    # Include values with 'D' and starting with a number
-                    input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
+    # Iterate through the headers
+    for header in headers:
+        if header == "Sales":
+            # Include values starting with 'A' and starting with a number
+            sales_values_starting_with_A = [value for value in text_values_list_1_1 if 'A' in value and re.match(r'^\d', value)]
+            if sales_values_starting_with_A:
+                input_dict[header] = sales_values_starting_with_A
+            else:
+                # Include values with 'C' and starting with a number
+                input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value and re.match(r'^\d', value)]
+        elif header == "Gross Profit":
+            # Include values with 'E' or 'e+' and starting with a number
+            input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1 if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
+        elif header == "Incentives":
+            # Include values with 'G' and starting with a number
+            input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value and re.match(r'^\d', value)]
+        elif header == "Chargeback":
+            # Include values with 'D' and starting with a number
+            input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
 
             st.header("Input Dictionary")
             st.write(input_dict)
