@@ -63,7 +63,7 @@ def main():
             pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, '')) for index, row in df2.iterrows())
     
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, '')) or 'D' in str(row.get(pcl_code_column, ''))) for index, row in df2.iterrows())
+            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, ''))) for index, row in df2.iterrows())
     
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
             pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get(pcl_code_column, '')) for index, row in df2.iterrows())
