@@ -56,24 +56,39 @@ def main():
     
             # PCL Mapping Criteria 
             st.header("PCL Mapping Criteria")
+            pass_criteria_messages = []
+
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in ['C', 'A', 'E']) for index, row in df2.iterrows())
-    
+            pass_sales_criteria = df2[(df2['Line Label'].str.contains('sales', case=False) | df2['Line Label'].str.contains('customer', case=False)) & 
+                                       df2['PCL code'].str.contains('[ACE]', case=False)].copy()
+            if not pass_sales_criteria.empty:
+                pass_criteria_messages.append("Sales/Customer records with PCL codes A, C, or E: ")
+                st.table(pass_sales_criteria)
+
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in ['B', 'E', 'D', 'F']) for index, row in df2.iterrows())
-    
-            # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
-            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
-    
-            if pass_sales_criteria and pass_cost_criteria and pass_incent_criteria:
-                st.success("PCL mapping criteria passed")
+            pass_cost_criteria = df2[df2['Line Label'].str.contains('cost', case=False) & 
+                                      df2['PCL code'].str.contains('[BEDF]', case=False)].copy()
+            if not pass_cost_criteria.empty:
+                pass_criteria_messages.append("Cost records with PCL codes B, E, D, or F: ")
+                st.table(pass_cost_criteria)
+
+            # Check if all records with 'incent' in Line Label meet the PCL mapping criteria
+            pass_incent_criteria = df2[df2['Line Label'].str.contains('incent', case=False) & 
+                                        df2['PCL code'].str.contains('G', case=False)].copy()
+            if not pass_incent_criteria.empty:
+                pass_criteria_messages.append("Incent records with PCL code G: ")
+                st.table(pass_incent_criteria)
+
+            if pass_criteria_messages:
+                st.success("PCL mapping criteria passed for the following cases:")
+                for message in pass_criteria_messages:
+                    st.write(message)
             else:
-                st.error("PCL mapping criteria not met")
-    
+                st.error("PCL mapping criteria not met for any case.")
+
             st.write("Data Validation")
-            # Extract unique values from df2['PCL code'] or df2['PCL codes']
-            pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
-            df2_values = set(df2[pcl_code_column].dropna().values)
+            # Extract unique values from df2['PCL code']
+            df2_values = set(df2['PCL code'].dropna().values)
     
             # Check if all records in text_values_list_1_1 are available in pcl_code_column
             unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
