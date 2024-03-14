@@ -71,7 +71,7 @@ def main():
             st.header("PCL Mapping Criteria")
     
             # Filter mismatched records
-            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, ''))) or 
+            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, '')))) or 
                                         ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, ''))) or
                                         (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get(pcl_code_column, '')))), axis=1)]
             mismatched_records = mismatched_records.dropna()
