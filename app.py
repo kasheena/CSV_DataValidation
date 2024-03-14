@@ -51,6 +51,8 @@ def main():
 
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
+        # Extract unique values from df2['PCL code'] or df2['PCL codes']
+        pcl_code_column = [col for col in df2.columns if 'PCL' in col][0] if any('PCL' in col for col in df2.columns) else None
     
         if df2 is not None:
             st.header("DataFrame 2")
@@ -70,7 +72,7 @@ def main():
     
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, '')))) or 
-                                        ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, '')))) or
+                                        ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, ''))) or
                                         (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get(pcl_code_column, '')))), axis=1)]
             mismatched_records = mismatched_records.dropna()
             if mismatched_records.empty:
@@ -79,8 +81,7 @@ def main():
                 st.write(mismatched_records)
     
             st.write("Data Validation")
-            # Extract unique values from df2['PCL code'] or df2['PCL codes']
-            pcl_code_column = [col for col in df2.columns if 'PCL' in col][0] if any('PCL' in col for col in df2.columns) else None
+
             if pcl_code_column:
                 df2_values = set(df2[pcl_code_column].dropna().values)
             
