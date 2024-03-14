@@ -37,6 +37,7 @@ def main():
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
             
+            st.write(text_values_df1)
             st.write(text_values_list_1_1)
             # Initialize the input_dict
             input_dict = {}
