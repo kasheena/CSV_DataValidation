@@ -51,8 +51,6 @@ def main():
 
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
-        # Extract unique values from df2['PCL code'] or df2['PCL codes']
-        pcl_code_column = [col for col in df2.columns if 'PCL' in col][0] if any('PCL' in col for col in df2.columns) else None
     
         if df2 is not None:
             st.header("DataFrame 2")
@@ -60,20 +58,20 @@ def main():
     
             # PCL Mapping Criteria 
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, '')) for index, row in df2.iterrows())
+            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
     
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            pass_cost_criteria = all(('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, ''))) for index, row in df2.iterrows())
+            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', '')))) for index, row in df2.iterrows())
     
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
-            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get(pcl_code_column, '')) for index, row in df2.iterrows())
+            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
     
             st.header("PCL Mapping Criteria")
     
             # Filter mismatched records
-            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get(pcl_code_column, '')))) or 
-                                        ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get(pcl_code_column, ''))) or 'D' in str(row.get(pcl_code_column, ''))) or
-                                        (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get(pcl_code_column, '')))), axis=1)]
+            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', '')))) or 
+                                                                ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', ''))))) or
+                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', '')))), axis=1))]
             mismatched_records = mismatched_records.dropna()
             if mismatched_records.empty:
                 st.success("PCL mapping criteria passed")
@@ -81,21 +79,19 @@ def main():
                 st.write(mismatched_records)
     
             st.write("Data Validation")
-
-            if pcl_code_column:
-                df2_values = set(df2[pcl_code_column].dropna().values)
-            
-                # Check if all records in text_values_list_1_1 are available in pcl_code_column
-                unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
-            
-                if not unmatched_records:
-                    st.success("All records in text_values_list_1_1 are available in df2.")
-                else:
-                    st.error("Some records in text_values_list_1_1 are not available in df2.")
-                    st.header("Unmatched Records")
-                    st.write(unmatched_records)
+            # Extract unique values from df2['PCL code'] or df2['PCL codes']
+            pcl_code_column = 'PCL code' if 'PCL code' in df2.columns else 'PCL codes'
+            df2_values = set(df2[pcl_code_column].dropna().values)
+    
+            # Check if all records in text_values_list_1_1 are available in pcl_code_column
+            unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
+    
+            if not unmatched_records:
+                st.success("All records in text_values_list_1_1 are available in df2.")
             else:
-                st.error("No column containing 'PCL' found in DataFrame 2.")
+                st.error("Some records in text_values_list_1_1 are not available in df2.")
+                st.header("Unmatched Records")
+                st.write(unmatched_records)
 
 if __name__ == "__main__":
-    main()
+    main()   
