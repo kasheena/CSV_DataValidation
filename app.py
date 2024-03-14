@@ -80,7 +80,7 @@ def main():
     
             st.write("Data Validation")
             # Extract unique values from df2['PCL code'] or df2['PCL codes']
-            pcl_code_column = 'PCL code' if 'PCL code' in df2.columns else 'PCL codes'
+            pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
             df2_values = set(df2[pcl_code_column].dropna().values)
     
             # Check if all records in text_values_list_1_1 are available in pcl_code_column
