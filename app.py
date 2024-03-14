@@ -6,7 +6,7 @@ def read_excel_file(file_path, sheet_name):
     if sheet_name:
         df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=9)
     else:
-        df = pd.read_excel(file_path, sheet_name=0, skiprows=9)
+        df = pd.read_excel(file_path, sheet_name=0, skiprows=8)
     return df
 
 def read_csv_file(file_path):
