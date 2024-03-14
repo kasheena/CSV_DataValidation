@@ -37,13 +37,14 @@ def main():
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
             
-            # Filter columns with words and records with a combination of 2 or 3 numbers and exactly 1 alphabet
-            filtered_text_values_df1 = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.contains(r'\b\w+\d{2,3}[a-zA-Z]\d{0,2}\b').any())]
+            # Filter columns with records matching the specified pattern
+            text_values_df1_filtered = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.match(r'^\d{1,3}[A-Z]\d{1,2}$').any())]
 
             # Drop columns with all NaN values
-            filtered_text_values_df1 = filtered_text_values_df1.dropna(axis=1, how='all')
+            text_values_df1_filtered = text_values_df1_filtered.dropna(axis=1, how='all')
 
-            st.write(filtered_text_values_df1)
+            # Display the filtered DataFrame
+            st.write(text_values_df1_filtered)
             
             st.write(text_values_df1)
             st.write(text_values_list_1_1)
