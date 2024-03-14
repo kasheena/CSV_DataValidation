@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import re
-
 def read_excel_file(file_path, sheet_name):
     if sheet_name:
         df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=9)
@@ -19,9 +18,7 @@ def main():
     st.sidebar.header("Upload Files")
     uploaded_file1 = st.sidebar.file_uploader("Upload Excel file for DataFrame 1", type=["xlsx", "xls"])
     uploaded_file2 = st.sidebar.file_uploader("Upload CSV file for DataFrame 2", type=["csv"])
-
-    if uploaded_file1:
-        selected_sheet = st.sidebar.selectbox("Select sheet", [""] + pd.ExcelFile(uploaded_file1).sheet_names)
+	@@ -23,21 +25,37 @@ def main():
         df1 = read_excel_file(uploaded_file1, selected_sheet)
 
         if df1 is not None:
@@ -39,10 +36,10 @@ def main():
 
             # Initialize the input_dict
             input_dict = {}
-            
+
             # Define the headers
             headers = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
-            
+
             # Iterate through the headers
             for header in headers:
                 if header == "Sales":
@@ -59,12 +56,7 @@ def main():
                     input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
 
             st.header("Input Dictionary")
-            st.write(input_dict)
-
-    if uploaded_file2:
-        df2 = read_csv_file(uploaded_file2)
-    
-        if df2 is not None:
+	@@ -50,27 +68,46 @@ def main():
             st.header("DataFrame 2")
             st.table(df2)
 
@@ -90,33 +82,30 @@ def main():
             else:
                 st.write(mismatched_records)
 
-            # Data Validation
-            st.write("Data Validation")
+    st.write("Data Validation")
+    # Extract unique values from df2['PCL code']
+    df2_values = set(df2['PCL code'].dropna().values)
 
-            # Extract unique values from df2['PCL code']
-            df2_values = set(df2['PCL code'].dropna().values)
+    # Check for validation
+    validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
 
-            # Check for validation
-            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+    # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+    unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
-            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+    # Check for values in input_dict that do not match df2_values
+    mismatched_values = {}
+    for header, values in input_dict.items():
+        for value in values:
+            if value not in df2_values:
+                if header not in mismatched_values:
+                    mismatched_values[header] = []
+                mismatched_values[header].append(value)
 
-            # Check for values in input_dict that do not match df2_values
-            mismatched_values = {}
-            for header, values in input_dict.items():
-                for value in values:
-                    if value not in df2_values:
-                        if header not in mismatched_values:
-                            mismatched_values[header] = []
-                        mismatched_values[header].append(value)
-
-            if not mismatched_values:
-                st.success("All values in input_dict exist in df2_values.")
-            else:
-                st.error("Some values in input_dict do not exist in df2_values.")
-                st.header("Mismatched Values")
-                st.write(mismatched_values)
-
+    if not mismatched_values:
+        st.success("All values in input_dict exist in df2_values.")
+    else:
+        st.error("Some values in input_dict do not exist in df2_values.")
+        st.header("Mismatched Values")
+        st.write(mismatched_values)
 if __name__ == "__main__":
     main()
