@@ -62,7 +62,7 @@ def main():
                 st.error("Sales criteria not met")
                 # Filter mismatched records for sales criteria
                 mismatched_sales_records = df2[~((df2['Line Label'].str.lower().str.contains('sales') | df2['Line Label'].str.lower().str.contains('customer')) & 
-                                                 df2['pcl_code_column].str.contains('[CAE]', case=False))]
+                                                 df2[pcl_code_column].str.contains('[CAE]', case=False))]
                 if not mismatched_sales_records.empty:
                     st.header("Mismatched Records for Sales Criteria")
                     st.table(mismatched_sales_records)
