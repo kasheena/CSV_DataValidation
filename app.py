@@ -90,31 +90,33 @@ def main():
             else:
                 st.write(mismatched_records)
 
-    st.write("Data Validation")
-    # Extract unique values from df2['PCL code']
-    df2_values = set(df2['PCL code'].dropna().values)
+            # Data Validation
+            st.write("Data Validation")
 
-    # Check for validation
-    validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+            # Extract unique values from df2['PCL code']
+            df2_values = set(df2['PCL code'].dropna().values)
 
-    # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-    unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
+            # Check for validation
+            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
 
-    # Check for values in input_dict that do not match df2_values
-    mismatched_values = {}
-    for header, values in input_dict.items():
-        for value in values:
-            if value not in df2_values:
-                if header not in mismatched_values:
-                    mismatched_values[header] = []
-                mismatched_values[header].append(value)
+            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
+            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
 
-    if not mismatched_values:
-        st.success("All values in input_dict exist in df2_values.")
-    else:
-        st.error("Some values in input_dict do not exist in df2_values.")
-        st.header("Mismatched Values")
-        st.write(mismatched_values)
+            # Check for values in input_dict that do not match df2_values
+            mismatched_values = {}
+            for header, values in input_dict.items():
+                for value in values:
+                    if value not in df2_values:
+                        if header not in mismatched_values:
+                            mismatched_values[header] = []
+                        mismatched_values[header].append(value)
+
+            if not mismatched_values:
+                st.success("All values in input_dict exist in df2_values.")
+            else:
+                st.error("Some values in input_dict do not exist in df2_values.")
+                st.header("Mismatched Values")
+                st.write(mismatched_values)
 
 if __name__ == "__main__":
     main()
