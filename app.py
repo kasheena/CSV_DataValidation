@@ -36,46 +36,8 @@ def main():
             text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
-            
-            # Filter columns with records matching the specified pattern
-            text_values_df1 = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.contains(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b').any())]
 
-            # Create List 1.1 with only text values from filtered columns
-            text_values_list_1_1 = text_values_df1.stack().tolist()
-            # Filter values to include only those matching the specified pattern
-            text_values_list_1_1 = [value for value in text_values_list_1_1 if re.match(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b', value)]
-
-            st.write(text_values_df1)
             st.write(text_values_list_1_1)
-            
-            # Initialize the input_dict
-            input_dict = {}
-            
-            # Define the headers
-            headers = ["Sales", "Gross Profit", "Incentives", "Chargeback"]
-            
-    # Iterate through the headers
-    for header in headers:
-        if header == "Sales":
-            # Include values starting with 'A' and starting with a number
-            sales_values_starting_with_A = [value for value in text_values_list_1_1 if 'A' in value and re.match(r'^\d', value)]
-            if sales_values_starting_with_A:
-                input_dict[header] = sales_values_starting_with_A
-            else:
-                # Include values with 'C' and starting with a number
-                input_dict[header] = [value for value in text_values_list_1_1 if 'C' in value and re.match(r'^\d', value)]
-        elif header == "Gross Profit":
-            # Include values with 'E' or 'e+' and starting with a number
-            input_dict[header] = [value.upper().replace('E+', 'E') for value in text_values_list_1_1 if ('E' in value or 'e+' in value) and re.match(r'^\d', value)]
-        elif header == "Incentives":
-            # Include values with 'G' and starting with a number
-            input_dict[header] = [value for value in text_values_list_1_1 if 'G' in value and re.match(r'^\d', value)]
-        elif header == "Chargeback":
-            # Include values with 'D' and starting with a number
-            input_dict[header] = [value for value in text_values_list_1_1 if 'D' in value and re.match(r'^\d', value)]
-
-            st.header("Input Dictionary")
-            st.write(input_dict)
 
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
@@ -111,27 +73,15 @@ def main():
             pcl_code_column = 'PCL code' if 'PCL code' in df2.columns else 'PCL codes'
             df2_values = set(df2[pcl_code_column].dropna().values)
     
-            # Check for validation
-            validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
+            # Check if all records in text_values_list_1_1 are available in pcl_code_column
+            unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
     
-            # Filter out NaN values in DataFrame 1 before creating DataFrame 3
-            unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
-    
-            # Check for values in input_dict that do not match df2_values
-            mismatched_values = {}
-            for header, values in input_dict.items():
-                for value in values:
-                    if value not in df2_values:
-                        if header not in mismatched_values:
-                            mismatched_values[header] = []
-                        mismatched_values[header].append(value)
-    
-            if not mismatched_values:
-                st.success("All values in input_dict exist in df2_values.")
+            if not unmatched_records:
+                st.success("All records in text_values_list_1_1 are available in df2.")
             else:
-                st.error("Some values in input_dict do not exist in df2_values.")
-                st.header("Mismatched Values")
-                st.write(mismatched_values)
+                st.error("Some records in text_values_list_1_1 are not available in df2.")
+                st.header("Unmatched Records")
+                st.write(unmatched_records)
 
 if __name__ == "__main__":
     main()
