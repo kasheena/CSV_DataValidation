@@ -87,9 +87,10 @@ def main():
                 st.error("PCL mapping criteria not met for any case.")
 
             st.write("Data Validation")
-            # Extract unique values from df2['PCL code']
-            df2_values = set(df2['PCL code'].dropna().values)
-    
+            # Extract unique values from df2['PCL code'] or df2['PCL codes']
+            pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
+            df2_values = set(df2[pcl_code_column].dropna().values)
+            
             # Check if all records in text_values_list_1_1 are available in pcl_code_column
             unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
     
