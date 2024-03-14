@@ -44,15 +44,17 @@ def main():
             st.table(df2)
             # Extract unique values from df2['PCL code'] or df2['PCL codes']
             pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
-
             # PCL Mapping Criteria 
             st.header("PCL Mapping Criteria")
+            
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in ['C', 'A', 'E']) for index, row in df2.iterrows())
-
+            sales_criteria_codes = ['C', 'A', 'E']
+            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in sales_criteria_codes) for index, row in df2.iterrows())
+            
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in ['B', 'E', 'D', 'F']) for index, row in df2.iterrows())
-
+            cost_criteria_codes = ['B', 'E', 'D', 'F']
+            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get('PCL code', row.get('PCL codes', ''))) for code in cost_criteria_codes) for index, row in df2.iterrows())
+            
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
             pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
 
