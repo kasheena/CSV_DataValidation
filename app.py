@@ -36,6 +36,16 @@ def main():
             text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
+            
+            # Filter columns with records matching the specified pattern
+            text_values_df1 = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.contains(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b').any())]
+
+            # Create List 1.1 with only text values from filtered columns
+            text_values_list_1_1 = text_values_df1.stack().tolist()
+            # Filter values to include only those matching the specified pattern
+            text_values_list_1_1 = [value for value in text_values_list_1_1 if re.match(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b', value)]
+
+            st.write(text_values_list_1_1)
 
             st.write(text_values_list_1_1)
 
