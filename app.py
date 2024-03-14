@@ -67,19 +67,19 @@ def main():
         if df2 is not None:
             st.header("DataFrame 2")
             st.table(df2)
-
+    
             # PCL Mapping Criteria 
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
             pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
-
+    
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
             pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', '')))) for index, row in df2.iterrows())
-
+    
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
             pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
-
+    
             st.header("PCL Mapping Criteria")
-
+    
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', '')))) or 
                                                                 ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', ''))))) or
@@ -89,17 +89,18 @@ def main():
                 st.success("PCL mapping criteria passed")
             else:
                 st.write(mismatched_records)
-
+    
             st.write("Data Validation")
-            # Extract unique values from df2['PCL code']
-            df2_values = set(df2['PCL code'].dropna().values)
-
+            # Extract unique values from df2['PCL code'] or df2['PCL codes']
+            pcl_code_column = 'PCL code' if 'PCL code' in df2.columns else 'PCL codes'
+            df2_values = set(df2[pcl_code_column].dropna().values)
+    
             # Check for validation
             validation_result = df1.applymap(lambda x: x in df2_values if not pd.isna(x) else False)
-
+    
             # Filter out NaN values in DataFrame 1 before creating DataFrame 3
             unmatched_records = df1[~validation_result.any(axis=1) & ~df1.isna().any(axis=1)]
-
+    
             # Check for values in input_dict that do not match df2_values
             mismatched_values = {}
             for header, values in input_dict.items():
@@ -108,7 +109,7 @@ def main():
                         if header not in mismatched_values:
                             mismatched_values[header] = []
                         mismatched_values[header].append(value)
-
+    
             if not mismatched_values:
                 st.success("All values in input_dict exist in df2_values.")
             else:
