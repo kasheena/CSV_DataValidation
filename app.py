@@ -36,7 +36,7 @@ def main():
             text_values_df1 = text_values_df1.applymap(lambda x: x if isinstance(x, str) and x != 'nan' else None)
             text_values_df1 = text_values_df1.dropna(axis=1, how='all')
             text_values_list_1_1 = text_values_df1.stack().tolist()
-            
+
             # Filter columns with records matching the specified pattern
             text_values_df1 = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.contains(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b').any())]
 
@@ -47,45 +47,55 @@ def main():
 
             st.write(text_values_list_1_1)
 
-            st.write(text_values_list_1_1)
-
     if uploaded_file2:
         df2 = read_csv_file(uploaded_file2)
-    
+
         if df2 is not None:
             st.header("DataFrame 2")
             st.table(df2)
-    
-            # PCL Mapping Criteria 
-            # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
-    
-            # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', '')))) for index, row in df2.iterrows())
-    
-            # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
-            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
-    
-            st.header("PCL Mapping Criteria")
-    
-            # Filter mismatched records
-            mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and 'C' in str(row.get('PCL code', row.get('PCL codes', '')))) or 
-                                                                ('cost' in str(row['Line Label']).lower() and ('E' in str(row.get('PCL code', row.get('PCL codes', ''))) or 'D' in str(row.get('PCL code', row.get('PCL codes', ''))))) or
-                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', '')))), axis=1))]
+
+            # Define PCL code criteria
+            pcl_criteria = {
+                'sales_customer': ['C', 'A', 'E'],
+                'cost': ['B', 'E', 'D', 'F'],
+                'incent': ['G']
+            }
+
+            # Function to check PCL mapping criteria for a given row
+            def check_pcl_criteria(row):
+                line_label = str(row['Line Label']).lower()
+                pcl_codes = str(row.get('PCL code', '')).upper()  # Ensure PCL codes are in uppercase
+                for key, codes in pcl_criteria.items():
+                    if key == 'sales_customer' and any(keyword in line_label for keyword in ['sales', 'customer']):
+                        if any(code in pcl_codes for code in codes):
+                            return True
+                    elif key == 'cost' and 'cost' in line_label:
+                        if any(code in pcl_codes for code in codes):
+                            return True
+                    elif key == 'incent' and 'incent' in line_label:
+                        if any(code in pcl_codes for code in codes):
+                            return True
+                return False
+
+            # Apply PCL mapping criteria
+            df2['Pass PCL Criteria'] = df2.apply(check_pcl_criteria, axis=1)
+
+            # Filter records that do not meet PCL mapping criteria
+            mismatched_records = df2[~df2['Pass PCL Criteria']]
             mismatched_records = mismatched_records.dropna()
             if mismatched_records.empty:
                 st.success("PCL mapping criteria passed")
             else:
                 st.write(mismatched_records)
-    
+
             st.write("Data Validation")
-            # Extract unique values from df2['PCL code'] or df2['PCL codes']
-            pcl_code_column = next((col for col in df2.columns if 'PCL' in col), None)
-            df2_values = set(df2[pcl_code_column].dropna().values)
-    
+            # Extract unique values from df2['PCL code']
+            pcl_code_column = 'PCL code'
+            df2_values = set(df2[pcl_code_column].dropna().str.upper().values)
+
             # Check if all records in text_values_list_1_1 are available in pcl_code_column
             unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
-    
+
             if not unmatched_records:
                 st.success("All records in text_values_list_1_1 are available in df2.")
             else:
@@ -94,4 +104,4 @@ def main():
                 st.write(unmatched_records)
 
 if __name__ == "__main__":
-    main()   
+    main()
