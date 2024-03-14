@@ -58,38 +58,25 @@ def main():
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
             pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get('PCL code', row.get('PCL codes', ''))) for index, row in df2.iterrows())
 
-            if pass_sales_criteria:
-                st.success("Sales criteria passed")
+            # Combine all criteria into a single condition
+            pass_all_criteria = pass_sales_criteria and pass_cost_criteria and pass_incent_criteria
+            
+            if pass_all_criteria:
+                st.success("All criteria passed")
             else:
-                st.error("Sales criteria not met")
-                # Filter mismatched records for sales criteria
-                mismatched_sales_records = df2[~((df2['Line Label'].str.lower().str.contains('sales') | df2['Line Label'].str.lower().str.contains('customer')) & 
-                                                 df2[pcl_code_column].isin(sales_criteria_codes))]
-                if not mismatched_sales_records.empty:
-                    st.header("Mismatched Records for Sales Criteria")
-                    st.table(mismatched_sales_records)
-                    
-            if pass_cost_criteria:
-                st.success("Cost criteria passed")
-            else:
-                st.error("Cost criteria not met")
-                # Filter mismatched records for cost criteria
-                mismatched_cost_records = df2[~((df2['Line Label'].str.lower().str.contains('cost')) & 
-                                                df2[pcl_code_column].isin(cost_criteria_codes))]
-                if not mismatched_cost_records.empty:
-                    st.header("Mismatched Records for Cost Criteria")
-                    st.table(mismatched_cost_records)
-
-            if pass_incent_criteria:
-                st.success("Incent criteria passed")
-            else:
-                st.error("Incent criteria not met")
-                # Filter mismatched records for incent criteria
-                mismatched_incent_records = df2[~((df2['Line Label'].str.lower().str.contains('incent') | df2['Line Label'].str.lower().str.contains('new other cost')) & 
-                                                  df2[pcl_code_column].str.contains('G', case=False))]
-                if not mismatched_incent_records.empty:
-                    st.header("Mismatched Records for Incent Criteria")
-                    st.table(mismatched_incent_records)
+                st.error("One or more criteria not met")
+            
+                # Filter mismatched records for all criteria
+                mismatched_records = df2[~(((df2['Line Label'].str.lower().str.contains('sales') | df2['Line Label'].str.lower().str.contains('customer')) & 
+                                             df2[pcl_code_column].isin(sales_criteria_codes)) |
+                                            ((df2['Line Label'].str.lower().str.contains('cost')) & 
+                                             df2[pcl_code_column].isin(cost_criteria_codes)) |
+                                            ((df2['Line Label'].str.lower().str.contains('incent') | df2['Line Label'].str.lower().str.contains('new other cost')) & 
+                                             df2[pcl_code_column].str.contains('G', case=False)))]
+            
+                if not mismatched_records.empty:
+                    st.header("Mismatched Records")
+                    st.table(mismatched_records)
 
             st.write("Data Validation")
             df2_values = set(df2[pcl_code_column].dropna().values)
