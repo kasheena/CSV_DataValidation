@@ -38,16 +38,14 @@ def main():
             text_values_list_1_1 = text_values_df1.stack().tolist()
             
             # Filter columns with records matching the specified pattern
-            text_values_df1_filtered = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.match(r'^\d{1,3}[A-Z]\d{1,2}$').any())]
+            text_values_df1 = text_values_df1.loc[:, text_values_df1.apply(lambda col: col.str.contains(r'\b(?:[1-9][A-G]|[A-G][1-9])[0-9]{2}\b').any())]
 
-            # Drop columns with all NaN values
-            text_values_df1_filtered = text_values_df1_filtered.dropna(axis=1, how='all')
+            # Create List 1.1 with only text values from filtered columns
+            text_values_list_1_1 = text_values_df1.stack().tolist()
 
-            # Display the filtered DataFrame
-            st.write(text_values_df1_filtered)
-            
             st.write(text_values_df1)
             st.write(text_values_list_1_1)
+            
             # Initialize the input_dict
             input_dict = {}
             
