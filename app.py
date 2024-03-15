@@ -1,15 +1,18 @@
 import streamlit as st
 import pandas as pd
 import re
+
 def read_excel_file(file_path, sheet_name):
     if sheet_name:
         df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=9)
     else:
         df = pd.read_excel(file_path, sheet_name=0, skiprows=8)
     return df
+
 def read_csv_file(file_path):
     df = pd.read_csv(file_path)
     return df
+
 def main():
     st.title("Data Validation App")
     st.sidebar.header("Upload Files")
@@ -49,7 +52,7 @@ def main():
             
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
             sales_criteria_codes = ['C', 'A', 'E']
-            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes) for index, row in df2.iterrows())
+            pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes) or 'A' in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for index, row in df2.iterrows())
             
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
             cost_criteria_codes = ['B', 'E', 'D', 'F']
