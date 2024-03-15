@@ -62,7 +62,7 @@ def main():
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes)) or 
                                                                 ('cost' in str(row['Line Label']).lower() and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in cost_criteria_codes)) or
-                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in incent_criteria_codes))
+                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in incent_criteria_codes))), axis=1))]
 
             
             mismatched_records = mismatched_records.dropna()
