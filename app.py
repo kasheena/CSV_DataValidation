@@ -56,7 +56,7 @@ def main():
             pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in cost_criteria_codes) for index, row in df2.iterrows())
             
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
-            incent_criteria_codes = ['G', 'B']  # Additional criteria for 'incent' or 'new other cost'
+            incent_criteria_codes = ['G', 'B']  
             pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in incent_criteria_codes) for index, row in df2.iterrows())
             
             # Filter mismatched records
