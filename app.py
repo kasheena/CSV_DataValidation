@@ -48,7 +48,7 @@ def main():
             st.header("PCL Mapping Criteria")
             
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            sales_criteria_codes = ['C', 'A']
+            sales_criteria_codes = ['C', 'A', 'E']
             pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes) for index, row in df2.iterrows())
             
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
