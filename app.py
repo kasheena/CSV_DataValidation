@@ -54,14 +54,16 @@ def main():
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
             cost_criteria_codes = ['B', 'E', 'D', 'F']
             pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in cost_criteria_codes) for index, row in df2.iterrows())
-
+            
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
-            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for index, row in df2.iterrows())
-
+            incent_criteria_codes = ['G', 'B']  # Additional criteria for 'incent' or 'new other cost'
+            pass_incent_criteria = all(('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in incent_criteria_codes) for index, row in df2.iterrows())
+            
             # Filter mismatched records
             mismatched_records = df2[~(df2.apply(lambda row: (('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes)) or 
                                                                 ('cost' in str(row['Line Label']).lower() and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in cost_criteria_codes)) or
-                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and 'G' in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', '')))), axis=1))]
+                                                                (('incent' in str(row['Line Label']).lower() or 'new other cost' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in incent_criteria_codes)))), axis=1))]
+
             
             mismatched_records = mismatched_records.dropna()
 
