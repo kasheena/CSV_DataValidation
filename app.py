@@ -48,11 +48,11 @@ def main():
             st.header("PCL Mapping Criteria")
             
             # Check if all records with 'sales' or 'customer' in Line Label meet the PCL mapping criteria
-            sales_criteria_codes = ['C', 'A', 'E']
+            sales_criteria_codes = ['A', 'B','C','E','W']
             pass_sales_criteria = all(('sales' in str(row['Line Label']).lower() or 'customer' in str(row['Line Label']).lower()) and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in sales_criteria_codes) for index, row in df2.iterrows())
             
             # Check if all records with 'cost' in Line Label meet the PCL mapping criteria
-            cost_criteria_codes = ['B', 'E', 'D', 'F']
+            cost_criteria_codes = ['A','B', 'C', 'E', 'D', 'F','X']
             pass_cost_criteria = all('cost' in str(row['Line Label']).lower() and any(code in str(row.get([col for col in df2.columns if 'PCL' in col][0], row.get('PCL codes', ''))) for code in cost_criteria_codes) for index, row in df2.iterrows())
             
             # Check if all records with 'incent' or 'New Other Cost' in Line Label meet the PCL mapping criteria
@@ -70,6 +70,10 @@ def main():
             else:
                 st.write(mismatched_records)
             st.header("Data Validation")
+            # Determine distinct alphabets in pcl_code_column
+            distinct_alphabets = df2[pcl_code_column].str.extract(r'([A-Z])').dropna()[0].unique().tolist()
+            st.write("Distinct Alphabets in pcl_code_column:", distinct_alphabets)
+            
             df2_values = set(df2[pcl_code_column].dropna().values)
             # Check if all records in text_values_list_1_1 are available in pcl_code_column
             unmatched_records = [value for value in text_values_list_1_1 if value not in df2_values]
